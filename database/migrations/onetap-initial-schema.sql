@@ -74,6 +74,7 @@ instructors {
 students {
 	id integer pk increments unique
 	user_id integer > users.id
+	program_id integer > programs.id
 	created_at timestamp
 	updated_at timestamp
 }
