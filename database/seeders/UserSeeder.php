@@ -25,53 +25,53 @@ class UserSeeder extends Seeder
         $admin->roles()->attach(Role::where('name', 'Administrator')->first());
 
         $faculty = User::create([
-            'first_name' => 'Mark',
-            'last_name'  => 'Fernandez',
-            'sex' => 'M',
+            'first_name' => 'Faculty',
+            'last_name'  => 'Dummy',
+            'sex'        => 'M',
             'city'       => 'Metro Manila',
             'town'       => 'Pasig',
             'province'   => 'NCR',
-            'email'      => 'mark@onetap.test',
-            'password'   => Hash::make('password123'),
+            'email'      => 'faculty@onetap.test',
+            'password'   => Hash::make('faculty123'),
         ]);
 
         $faculty->roles()->attach(Role::where('name', 'Faculty')->first());
 
         $instructor = User::create([
-            'first_name' => 'Yvonne',
-            'last_name'  => 'Lopez',
-            'sex' => 'F',
+            'first_name' => 'Instructor',
+            'last_name'  => 'Dummy',
+            'sex'        => 'F',
             'city'       => 'Metro Manila',
             'town'       => 'Pasay',
             'province'   => 'NCR',
-            'email'      => 'yvonne@onetap.test',
-            'password'   => Hash::make('password123'),
+            'email'      => 'instructor@onetap.test',
+            'password'   => Hash::make('instructor123'),
         ]);
 
         $instructor->roles()->attach(Role::where('name', 'Instructor')->first());
 
         $officer = User::create([
-            'first_name' => 'Shandi',
-            'last_name'  => 'Dope',
-            'sex' => 'F',
+            'first_name' => 'Class Secretary',
+            'last_name'  => 'Dummy',
+            'sex'        => 'F',
             'city'       => 'Metro Manila',
             'town'       => 'Makati',
             'province'   => 'NCR',
-            'email'      => 'shandidope@onetap.student.test',
-            'password'   => Hash::make('password123'),
+            'email'      => 'secretary@onetap.student.test',
+            'password'   => Hash::make('secretary123'),
         ]);
 
         $officer->roles()->attach(Role::where('name', 'Officer')->first());
 
         $student = User::create([
-            'first_name' => 'Eu',
-            'last_name'  => 'Nice',
-            'sex' => 'F',
+            'first_name' => 'Student',
+            'last_name'  => 'Dummy',
+            'sex'        => 'F',
             'city'       => 'Metro Manila',
             'town'       => 'Makati',
             'province'   => 'NCR',
-            'email'      => 'eunice@onetap.student.test',
-            'password'   => Hash::make('password123'),
+            'email'      => 'student@onetap.student.test',
+            'password'   => Hash::make('student123'),
         ]);
 
         $student->roles()->attach(Role::where('name', 'Student')->first());
