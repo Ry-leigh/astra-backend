@@ -85,8 +85,10 @@ class AnnouncementController extends Controller
         return response()->json($announcements);
     }
 
-    public function show(Announcement $announcement) {
-        
+    public function show($id) {
+        $announcement = Announcement::with(['targets', 'user'])->findOrFail($id);
+
+        return response()->json($announcement);
     }
 
     public function create() {
@@ -218,9 +220,7 @@ class AnnouncementController extends Controller
             }
         }
 
-        foreach ($targets as $target) {
-            $announcement->targets()->create($target);
-        }
+        $announcement->targets()->createMany($targets);
 
         return response()->json(['message' => 'Announcement created successfully!']);
     }
