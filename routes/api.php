@@ -11,16 +11,39 @@ Route::get('/user', function (Request $request) {
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-Route::middleware(['auth:sanctum', 'role:Administrator'])->group(function () {
+// api/admin
+Route::middleware(['auth:sanctum', 'role:Administrator'])
+     ->prefix('admin')
+     ->group(function () {
 
-    Route::get('/admin/dashboard', function () {
-        return response()->json(['message' => 'Welcome, Admin!']);
-    });
+    Route::get('/dashboard', function () {return response()->json(['message' => 'Welcome, Admin!']);});
+
 });
 
-Route::middleware(['auth:sanctum', 'role:Faculty,Instructor'])->group(function () {
+// api/instructor
+Route::middleware(['auth:sanctum', 'role:Instructor'])
+     ->prefix('instructor')
+     ->group(function () {
 
-    Route::get('/instructor/dashboard', function () {
-        return response()->json(['message' => 'Welcome, Mr./Ms.!']);
-    });
+    Route::get('/dashboard', function () {return response()->json(['message' => 'Welcome, Mr./Ms.!']);});
+
+});
+
+// api/officer
+Route::middleware(['auth:sanctum', 'role:Officer'])
+     ->prefix('officer')
+     ->group(function () {
+
+
+
+});
+
+
+// api/student
+Route::middleware(['auth:sanctum', 'role:Student,Officer'])
+     ->prefix('student')
+     ->group(function () {
+
+    Route::get('/dashboard', function () {return response()->json(['message' => 'Hello there!']);});
+
 });
