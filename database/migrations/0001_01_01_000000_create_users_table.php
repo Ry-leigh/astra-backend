@@ -14,9 +14,7 @@ return new class extends Migration
             $table->string('middle_name')->nullable();
             $table->string('last_name');
             $table->char('sex', 1)->nullable();
-            $table->string('city');
-            $table->string('town');
-            $table->string('province');
+            $table->string('address');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
