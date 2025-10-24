@@ -288,7 +288,10 @@ class AnnouncementController extends Controller
         return response()->json(['message' => 'Announcement updated successfully!']);
     }
 
-    public function destroy() {
+    public function destroy($id) {
+        $announcement = Announcement::findOrFail($id);
+        $announcement->delete();
 
+        return response()->json(['message' => 'Announcement deleted successfully']);
     }
 }
