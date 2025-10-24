@@ -225,8 +225,67 @@ class AnnouncementController extends Controller
         return response()->json(['message' => 'Announcement created successfully!']);
     }
 
-    public function update(Request $request, Announcement $announcement) {
+    public function update(Request $request, $id) {
+        $user = Auth::user();
 
+        // sample request structure
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'event_date' => 'nullable|date',
+            'event_time' => 'nullable',
+            'targets' => 'required|array',
+            'targets.global' => 'boolean',
+            'targets.roles' => 'array',
+            'targets.programs' => 'array',
+            'targets.classrooms' => 'array',
+            'targets.class_courses' => 'array',
+        ]);
+
+        $announcement = Announcement::findOrFail($id);
+
+        $announcement->update([
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'event_date' => $validated['event_date'] ?? null,
+            'event_time' => $validated['event_time'] ?? null,
+            'last_updated_by' => $user->id,
+        ]);
+
+        $targets = [];
+
+        // Global
+        if (!empty($validated['targets']['global']) && $validated['targets']['global'] === true) {
+            $targets[] = [
+                'target_type' => 'global',
+                'target_id' => null,
+            ];
+        } else {
+
+            // referenced from the announcement_targets table
+            $mapping = [
+                'roles' => 'role',
+                'programs' => 'program',
+                'classrooms' => 'classroom',
+                'class_courses' => 'course',
+            ];
+
+            foreach ($mapping as $key => $type) {
+                if (!empty($validated['targets'][$key])) {
+                    foreach ($validated['targets'][$key] as $id) {
+                        $targets[] = [
+                            'target_type' => $type,
+                            'target_id' => $id,
+                        ];
+                    }
+                }
+            }
+        }
+
+        $announcement->targets()->delete();
+        $announcement->targets()->createMany($targets);
+
+        return response()->json(['message' => 'Announcement updated successfully!']);
     }
 
     public function destroy() {
