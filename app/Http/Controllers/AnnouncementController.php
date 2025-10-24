@@ -3,8 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Announcement;
+use App\Models\ClassCourse;
+use App\Models\Classroom;
+use App\Models\Program;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AnnouncementController extends Controller
 {
@@ -85,7 +90,77 @@ class AnnouncementController extends Controller
     }
 
     public function create() {
-        
+        $user = Auth::user();
+
+        $roleNames = $user->roles->pluck('name')->toArray();
+        $roleIds = $user->roles->pluck('id')->toArray();
+
+        if (in_array('Administrator', $roleNames)) {
+
+            $roles = Role::select('id', 'name')->get();
+
+            $programs = Program::select('id', 'name')->get();
+
+            $classrooms = Classroom::join('programs', 'classrooms.program_id', '=', 'programs.id')
+                ->select('classrooms.id', DB::raw("CONCAT(programs.name, ' ', classrooms.year_level, classrooms.section) as name"))
+                ->get();
+
+            $classCourses = ClassCourse::with(['course', 'instructor.user', 'classroom.program'])
+                ->get()
+                ->map(fn($cc) => [
+                    'id' => $cc->id,
+                    'name' => sprintf(
+                        '%s | %s - %s %s%s',
+                        $cc->course->name,
+                        match($cc->instructor->user->sex) {
+                            'M' => 'Sir ',
+                            'F' => "Ma'am ",
+                            default => '',
+                        } . $cc->instructor->user->first_name . ' ' . $cc->instructor->user->last_name,
+                        $cc->classroom->program->name,
+                        $cc->classroom->year_level,
+                        $cc->classroom->section
+                    )
+                ]);
+                
+            return response()->json([
+                'roles' => $roles,
+                'programs' => $programs,
+                'classrooms' => $classrooms,
+                'class_courses' => $classCourses,
+            ]);
+
+        } elseif (in_array('Instructor', $roleNames)) {
+            
+            $instructor = $user->instructor;
+
+            $classrooms = Classroom::join('programs', 'classrooms.program_id', '=', 'programs.id')
+                ->whereHas('classCourses', fn($q) =>
+                    $q->where('instructor_id', $instructor->id)
+                )
+                ->select('classrooms.id', DB::raw("CONCAT(programs.name, ' ', classrooms.year_level, classrooms.section) as name"))
+                ->get();
+
+            $classCourses = ClassCourse::with(['course', 'classroom.program'])
+                ->where('instructor_id', $instructor->id)
+                ->get()
+                ->map(fn($cc) => [
+                    'id' => $cc->id,
+                    'name' => sprintf(
+                        '%s | %s %s%s',
+                        $cc->course->name,
+                        $cc->classroom->program->name,
+                        $cc->classroom->year_level,
+                        $cc->classroom->section
+                    )
+            ]);
+
+            return response()->json([
+                'classrooms' => $classrooms,
+                'class_courses' => $classCourses,
+            ]);
+            
+        }
     }
 
     public function store(Request $request) {
