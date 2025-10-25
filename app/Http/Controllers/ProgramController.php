@@ -29,8 +29,14 @@ class ProgramController extends Controller
         return response()->json(['success' => true, 'data' => $program], 201);
     }
 
-    public function update(Request $request, Program $program)
+    public function update(Request $request, $id)
     {
+        $program = Program::find($id);
+
+        if (!$program) {
+            return response()->json(['message' => 'Program not found.'], 404);
+        }
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|unique:programs,name,' . $program->id,
             'description' => 'nullable|string',
@@ -45,9 +51,16 @@ class ProgramController extends Controller
         return response()->json(['success' => true, 'data' => $program]);
     }
 
-    public function destroy(Program $program) {
+    public function destroy($id) {
+        $program = Program::find($id);
+
+        if (!$program) {
+            return response()->json(['message' => 'Program not found.'], 404);
+        }
+
         $program->delete();
 
         return response()->json(['success' => true, 'message' => 'Program deleted successfully']);
     }
 }
+    
