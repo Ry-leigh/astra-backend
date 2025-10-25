@@ -4,6 +4,9 @@ use App\Http\Controllers\AnnouncementController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ClassroomController;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\ProgramController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -27,6 +30,27 @@ Route::middleware(['auth:sanctum', 'role:Administrator'])
         Route::delete('/{id}', [AnnouncementController::class, 'destroy']); // delete announcement->id == {id}
         Route::get('/', [AnnouncementController::class, 'index']); // list all announcements
         Route::post('/', [AnnouncementController::class, 'store']); // create announcement
+    });
+
+    Route::prefix('programs')->group(function () {
+        Route::put('/{id}', [ProgramController::class, 'update']);
+        Route::delete('/{id}', [ProgramController::class, 'destroy']);
+        Route::get('/', [ProgramController::class, 'index']);
+        Route::post('/', [ProgramController::class, 'store']);
+    });
+
+    Route::prefix('classroom')->group(function () {
+        Route::put('/{id}', [ClassroomController::class, 'update']);
+        Route::delete('/{id}', [ClassroomController::class, 'destroy']);
+        Route::get('/', [ClassroomController::class, 'index']);
+        Route::post('/', [ClassroomController::class, 'store']);
+    });
+
+    Route::prefix('course')->group(function () {
+        Route::put('/{id}', [CourseController::class, 'update']);
+        Route::delete('/{id}', [CourseController::class, 'destroy']);
+        Route::get('/', [CourseController::class, 'index']);
+        Route::post('/', [CourseController::class, 'store']);
     });
 
 });
