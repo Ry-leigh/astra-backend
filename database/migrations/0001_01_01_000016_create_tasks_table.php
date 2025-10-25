@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('class_course_id')->constrained('class_courses')->cascadeOnDelete();
             $table->string('title');
             $table->text('description');
-            $table->date('due_date');
+            $table->date('due_date')->nullable();
             $table->time('due_time')->nullable();
             $table->enum('category', ['assignment', 'project', 'quiz', 'exam', 'activity', 'other']);
             $table->timestamps();
