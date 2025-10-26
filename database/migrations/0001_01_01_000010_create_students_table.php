@@ -13,8 +13,6 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('program_id')->nullable()->constrained('programs')->nullOnDelete();
             $table->string('year_level');
-            $table->string('section')->nullable()->default(NULL);
-            $table->timestamps();
         });
     }
 

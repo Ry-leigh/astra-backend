@@ -13,7 +13,6 @@ return new class extends Migration
             $table->foreignId('announcement_id')->constrained('announcements')->cascadeOnDelete();
             $table->enum('target_type', ['global', 'role', 'program', 'classroom', 'course']);
             $table->unsignedBigInteger('target_id')->nullable();
-            $table->timestamps();
         });
     }
 

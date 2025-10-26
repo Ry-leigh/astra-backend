@@ -86,7 +86,7 @@ class AnnouncementController extends Controller
     }
 
     public function show($id) {
-        $announcement = Announcement::with(['targets', 'user'])->findOrFail($id);
+        $announcement = Announcement::with(['targets'])->findOrFail($id);
 
         return response()->json($announcement);
     }

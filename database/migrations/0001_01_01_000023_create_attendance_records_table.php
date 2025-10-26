@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_id')->constrained('students')->cascadeOnDelete();
             $table->foreignId('class_session_id')->constrained('class_sessions')->cascadeOnDelete();
+            $table->time('instructor_time_in')->nullable();
+            $table->time('instructor_time_out')->nullable();
             $table->enum('status', ['present', 'late', 'absent', 'excused', 'suspended']);
-            $table->time('time_in')->nullable();
+            $table->time('student_time_in')->nullable();
             $table->string('remarks')->nullable();
             $table->foreignId('marked_by')->constrained('users')->cascadeOnDelete();
             $table->timestamps();

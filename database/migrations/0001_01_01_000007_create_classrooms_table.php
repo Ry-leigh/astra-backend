@@ -14,7 +14,6 @@ return new class extends Migration
             $table->string('year_level');
             $table->string('section')->nullable()->default(NULL);
             $table->string('academic_year');
-            $table->timestamps();
         });
     }
 

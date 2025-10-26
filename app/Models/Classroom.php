@@ -12,7 +12,8 @@ class Classroom extends Model
     protected $fillable = [
         'program_id',
         'year_level',
-        'section'];
+        'section',
+        'academic_year'];
 
     public function program()
     {
