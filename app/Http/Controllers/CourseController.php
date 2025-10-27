@@ -15,45 +15,33 @@ class CourseController extends Controller
     }
 
     public function store(Request $request) {
-        $validator = Validator::make($request->all(), [
+        $validated = $request->validate([
             'name'        => 'required|string|unique:courses,name',
             'description' => 'nullable|string',
-            'code'        => 'required|string|unique:courses,code',
+            'code'        => 'nullable|string|unique:courses,code',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
+        $course = Course::create($validated);
 
-        $course = Course::create([
-            'name'        => $request->name,
-            'description' => $request->description,
-            'code'        => $request->code,
-        ]);
-
-        return response()->json(['message' => 'Course created successfully.', 'course'  => $course], 201);
+        return response()->json(['success' => true, 'message' => 'Course created successfully.', 'data'    => $course], 201);
     }
 
     public function update(Request $request, $id) {
         $course = Course::find($id);
 
         if (!$course) {
-            return response()->json(['message' => 'Course not found.'], 404);
+            return response()->json(['success' => false, 'message' => 'Course not found.'], 404);
         }
 
-        $validator = Validator::make($request->all(), [
+        $validated = $request->validate([
             'name'        => 'sometimes|string|unique:courses,name,' . $course->id,
             'description' => 'nullable|string',
             'code'        => 'sometimes|string|unique:courses,code,' . $course->id,
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
+        $course->update($validated);
 
-        $course->update($validator->validated());
-
-        return response()->json(['message' => 'Course updated successfully.', 'course'  => $course]);
+        return response()->json(['success' => true, 'message' => 'Course updated successfully.', 'data'    => $course]);
     }
 
     public function destroy($id) {
