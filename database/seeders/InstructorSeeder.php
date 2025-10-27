@@ -10,6 +10,6 @@ class InstructorSeeder extends Seeder
 {
     public function run(): void
     {
-
+        Instructor::insert(['user_id' => 2]);
     }
 }
