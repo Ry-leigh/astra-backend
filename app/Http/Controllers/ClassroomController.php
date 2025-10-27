@@ -3,15 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Models\Classroom;
+use App\Models\Program;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ClassroomController extends Controller
 {
-    public function index() {
-        $classrooms = Classroom::with('program')->get();
+    public function index($programId)
+    {
+        // Find the program, or fail with 404
+        $program = Program::findOrFail($programId);
 
-        return response()->json(['success' => true, 'data' => $classrooms]);
+        // Retrieve all classrooms under that program
+        $classrooms = Classroom::with('program')
+            ->where('program_id', $program->id)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'program' => $program->name,
+            'data' => $classrooms,
+        ]);
     }
 
     public function store(Request $request) {

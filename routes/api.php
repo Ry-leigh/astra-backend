@@ -39,10 +39,10 @@ Route::middleware(['auth:sanctum', 'role:Administrator'])
         Route::post('/', [ProgramController::class, 'store']);
     });
 
-    Route::prefix('classroom')->group(function () {
+    Route::prefix('classrooms')->group(function () {
         Route::put('/{id}', [ClassroomController::class, 'update']);
         Route::delete('/{id}', [ClassroomController::class, 'destroy']);
-        Route::get('/', [ClassroomController::class, 'index']);
+        Route::get('/{program}', [ClassroomController::class, 'index']);
         Route::post('/', [ClassroomController::class, 'store']);
     });
 
