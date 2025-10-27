@@ -2,26 +2,56 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ClassCourse;
 use App\Models\Classroom;
 use App\Models\Program;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ClassroomController extends Controller
 {
-    public function index($programId) {
-        // Find the program, or fail with 404
+    // Admin: view all classrooms under a specific program
+    public function adminIndex($programId)
+    {
         $program = Program::findOrFail($programId);
 
-        // Retrieve all classrooms under that program
-        $classrooms = Classroom::with('program')
+        $classrooms = Classroom::with('program:id,name')
             ->where('program_id', $program->id)
-            ->get();
+            ->get(['id', 'program_id', 'year_level', 'section', 'academic_year']);
 
         return response()->json([
             'success' => true,
             'program' => $program->name,
             'data' => $classrooms,
+        ]);
+    }
+
+    // Instructor: view all classrooms they’re teaching in
+    public function instructorIndex()
+    {
+        $user = Auth::user();
+        $instructor = $user->instructor;
+
+        if (!$instructor) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Instructor profile not found.'
+            ], 403);
+        }
+
+        // Fetch all class courses tied to this instructor
+        $classCourses = ClassCourse::with([
+            'course:id,name,code,description',
+            'classroom:id,program_id,year_level,section,academic_year',
+            'classroom.program:id,name',
+        ])
+        ->where('instructor_id', $instructor->id)
+        ->get(['id', 'course_id', 'classroom_id', 'instructor_id', 'semester']);
+
+        return response()->json([
+            'success' => true,
+            'data' => $classCourses
         ]);
     }
 
