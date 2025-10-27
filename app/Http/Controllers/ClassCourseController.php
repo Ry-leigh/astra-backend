@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class ClassCourseController extends Controller
 {
-    public function index($classId) {
+    public function index($classroomId) {
         $classCourse = ClassCourse::with([
             'course:id,name,code,description',
             'instructor:id,user_id',
@@ -15,7 +15,7 @@ class ClassCourseController extends Controller
             'enrollments' => function ($query) {$query->select('id', 'student_id', 'class_course_id');},
             'enrollments.student:id,user_id',
             'enrollments.student.user:id,first_name,last_name,email'
-        ])->findOrFail($classId);
+        ])->findOrFail($classroomId);
 
         return response()->json([
             'success' => true,
