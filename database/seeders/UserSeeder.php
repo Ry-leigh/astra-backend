@@ -2,11 +2,13 @@
 
 namespace Database\Seeders;
 
+use App\Models\Instructor;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Role;
+use App\Models\Student;
 
 class UserSeeder extends Seeder
 {
@@ -34,17 +36,6 @@ class UserSeeder extends Seeder
 
         $instructor->roles()->attach(Role::where('name', 'Instructor')->first());
 
-        $instructor = User::create([
-            'first_name' => 'Julian',
-            'last_name'  => 'Cross',
-            'sex'        => 'M',
-            'address'    => '',
-            'email'      => 'juliancross@onetap.test',
-            'password'   => Hash::make('instructor123'),
-        ]);
-
-        $instructor->roles()->attach(Role::where('name', 'Instructor')->first());
-
         $officer = User::create([
             'first_name' => 'Liora',
             'last_name'  => 'Valdez',
@@ -66,5 +57,40 @@ class UserSeeder extends Seeder
         ]);
 
         $student->roles()->attach(Role::where('name', 'Student')->first());
+
+        $users = User::factory()->count(200)->create();
+
+        $adminUsers         = $users->skip(4)->take(2);
+        $instructorUsers    = $users->skip(6)->take(20);
+        $officerUsers       = $users->skip(26)->take(20);
+        $studentUsers       = $users->skip(46);
+
+        $adminUsers->each(fn($user) => $user->roles()->attach(1));
+        $instructorUsers->each(fn($user) => $user->roles()->attach(2));
+        $officerUsers->each(fn($user) => $user->roles()->attach(3));
+        $studentUsers->each(fn($user) => $user->roles()->attach(4));
+
+        $instructorUsers->each(function ($user) {
+            Instructor::create([
+                'user_id'       => $user->id,
+                'program_id'    => collect([null, 1, 5])->random(),
+            ]);
+        });
+
+        $officerUsers->each(function ($user) {
+            Student::create([
+                'user_id' => $user->id,
+                'program_id' => fake()->randomElement([1, 5]),
+                'year_level' => fake()->numberBetween(1, 4),
+            ]);
+        });
+
+        $studentUsers->each(function ($user) {
+            Student::create([
+                'user_id' => $user->id,
+                'program_id' => fake()->randomElement([1, 5]),
+                'year_level' => fake()->numberBetween(1, 4),
+            ]);
+        });
     }
 }
