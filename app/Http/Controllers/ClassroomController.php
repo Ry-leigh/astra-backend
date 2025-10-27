@@ -9,8 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ClassroomController extends Controller
 {
-    public function index($programId)
-    {
+    public function index($programId) {
         // Find the program, or fail with 404
         $program = Program::findOrFail($programId);
 
@@ -27,37 +26,37 @@ class ClassroomController extends Controller
     }
 
     public function store(Request $request) {
-        $validator = Validator::make($request->all(), [
+        $validated = $request->validate([
             'program_id'    => 'required|exists:programs,id',
-            'year_level'    => 'required|string',
+            'year_level'    => 'integer|string',
             'section'       => 'nullable|string',
             'academic_year' => 'required|string',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
-        }
+        $classroom = Classroom::create($validated);
 
-        $classroom = Classroom::create($request->only(['program_id', 'year_level', 'section', 'academic_year']));
-
-        return response()->json(['success' => true, 'data' => $classroom], 201);
+        return response()->json([
+            'success' => true,
+            'data' => $classroom,
+        ], 201);
     }
 
-    public function update(Request $request, Classroom $classroom) {
-        $validator = Validator::make($request->all(), [
+    public function update(Request $request, $id) {
+        $validated = $request->validate([
             'program_id'    => 'required|exists:programs,id',
             'year_level'    => 'required|string',
             'section'       => 'nullable|string',
             'academic_year' => 'required|string',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
-        }
+        $classroom = Classroom::findOrFail($id);
+        $classroom->update($validated);
 
-        $classroom->update($request->only(['program_id', 'year_level', 'section', 'academic_year']));
-
-        return response()->json(['success' => true, 'data' => $classroom]);
+        return response()->json([
+            'success' => true,
+            'message' => 'Classroom updated successfully.',
+            'data'    => $classroom
+        ]);
     }
 
     public function destroy(Classroom $classroom) {
