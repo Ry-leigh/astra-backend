@@ -9,6 +9,8 @@ use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ProgramController;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TaskStatusController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -65,6 +67,13 @@ Route::middleware(['auth:sanctum', 'role:Administrator'])
                 Route::get('/', [AnnouncementController::class, 'classIndex']);
                 Route::post('/', [AnnouncementController::class, 'classStore']);
             });
+
+            Route::prefix('tasks')->group(function () {
+                Route::put('/{id}', [TaskController::class, 'update']);
+                Route::delete('/{id}', [TaskController::class, 'destroy']);
+                Route::get('/', [TaskController::class, 'index']);
+                Route::post('/', [TaskController::class, 'store']);
+            });
         });
     });
 
@@ -106,6 +115,13 @@ Route::middleware(['auth:sanctum', 'role:Instructor'])
                 Route::get('/', [AnnouncementController::class, 'classIndex']);
                 Route::post('/', [AnnouncementController::class, 'classStore']);
             });
+
+            Route::prefix('tasks')->group(function () {
+                Route::put('/{id}', [TaskController::class, 'update']);
+                Route::delete('/{id}', [TaskController::class, 'destroy']);
+                Route::get('/', [TaskController::class, 'index']);
+                Route::post('/', [TaskController::class, 'store']);
+            });
         });
     });
 
@@ -138,9 +154,15 @@ Route::middleware(['auth:sanctum', 'role:Student,Officer'])
         Route::get('/', [AnnouncementController::class, 'index']); // list all announcements
     });
 
-    Route::prefix('class')->group(function () {
-        Route::get('/{class}', [ClassCourseController::class, 'index']);
-        Route::get('{class}/announcements', [AnnouncementController::class, 'classIndex']);
+    Route::prefix('class/{class}')->group(function () {
+        Route::get('/', [ClassCourseController::class, 'index']);
+        Route::get('/announcements', [AnnouncementController::class, 'classIndex']);
+
+        Route::prefix('tasks')->group(function () {
+            Route::get('/', [TaskController::class, 'studentIndex']);
+            Route::put('/{task}/complete', [TaskStatusController::class, 'markFinished']);
+            Route::put('/{task}/undo', [TaskStatusController::class, 'undoFinished']);
+        });
     });
 
 });
