@@ -56,7 +56,16 @@ Route::middleware(['auth:sanctum', 'role:Administrator'])
     });
 
     Route::prefix('class')->group(function () {
-        Route::get('/{classroom}', [ClassCourseController::class, 'index']);
+        Route::prefix('{class}')->group(function () {
+            Route::get('/', [ClassCourseController::class, 'index']);
+        
+            Route::prefix('announcements')->group(function () {
+                Route::put('/{id}', [AnnouncementController::class, 'classUpdate']);
+                Route::delete('/{id}', [AnnouncementController::class, 'classDestroy']);
+                Route::get('/', [AnnouncementController::class, 'classIndex']);
+                Route::post('/', [AnnouncementController::class, 'classStore']);
+            });
+        });
     });
 
     Route::prefix('enrollments')->group(function () {
@@ -88,7 +97,16 @@ Route::middleware(['auth:sanctum', 'role:Instructor'])
     });
 
     Route::prefix('class')->group(function () {
-        Route::get('/{classroom}', [ClassCourseController::class, 'index']);
+        Route::prefix('{class}')->group(function () {
+            Route::get('/', [ClassCourseController::class, 'index']);
+        
+            Route::prefix('announcements')->group(function () {
+                Route::put('/{id}', [AnnouncementController::class, 'classUpdate']);
+                Route::delete('/{id}', [AnnouncementController::class, 'classDestroy']);
+                Route::get('/', [AnnouncementController::class, 'classIndex']);
+                Route::post('/', [AnnouncementController::class, 'classStore']);
+            });
+        });
     });
 
     Route::prefix('enrollments')->group(function () {
@@ -122,6 +140,7 @@ Route::middleware(['auth:sanctum', 'role:Student,Officer'])
 
     Route::prefix('class')->group(function () {
         Route::get('/{class}', [ClassCourseController::class, 'index']);
+        Route::get('{class}/announcements', [AnnouncementController::class, 'classIndex']);
     });
 
 });
