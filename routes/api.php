@@ -8,6 +8,7 @@ use App\Http\Controllers\CalendarScheduleController;
 use App\Http\Controllers\ClassCourseController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\ClassScheduleController;
+use App\Http\Controllers\ClassSessionController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ProgramController;
@@ -101,6 +102,13 @@ Route::middleware(['auth:sanctum', 'role:Administrator'])
         Route::get('/', [ClassScheduleController::class, 'index']); // list all class schedules
         Route::post('/', [ClassScheduleController::class, 'store']); // create class schedules
     });
+
+    Route::prefix('class-sessions')->group(function () {
+        Route::get('/{classScheduleId}', [ClassSessionController::class, 'index']);
+        Route::put('/{id}', [ClassSessionController::class, 'update']);
+        Route::delete('/{id}', [ClassSessionController::class, 'destroy']);
+        Route::post('/', [ClassSessionController::class, 'store']);
+    });
 });
 
 // api/instructor
@@ -158,6 +166,12 @@ Route::middleware(['auth:sanctum', 'role:Instructor'])
         Route::get('/', [ClassScheduleController::class, 'index']); // show their respective schedules
         Route::get('/{id}', [ClassScheduleController::class, 'show']); // view details of a schedule
     });
+
+    Route::prefix('class-sessions')->group(function () {
+        Route::get('/{classScheduleId}', [ClassSessionController::class, 'index']);
+        Route::put('/{id}', [ClassSessionController::class, 'update']);
+        Route::post('/', [ClassSessionController::class, 'store']);
+    });
 });
 
 // api/officer
@@ -165,7 +179,11 @@ Route::middleware(['auth:sanctum', 'role:Officer'])
      ->prefix('officer')
      ->group(function () {
 
-
+    Route::prefix('class-sessions')->group(function () {
+        Route::get('/{classScheduleId}', [ClassSessionController::class, 'index']);
+        Route::put('/{id}', [ClassSessionController::class, 'update']);
+        Route::post('/', [ClassSessionController::class, 'store']);
+    });
 
 });
 
@@ -201,5 +219,9 @@ Route::middleware(['auth:sanctum', 'role:Student,Officer'])
     Route::prefix('class-schedules')->group(function () {
         Route::get('/', [ClassScheduleController::class, 'index']); // show their respective schedules
         Route::get('/{id}', [ClassScheduleController::class, 'show']); // view details of a schedule
+    });
+
+    Route::prefix('class-sessions')->group(function () {
+        Route::get('/{classScheduleId}', [ClassSessionController::class, 'index']);
     });
 });
