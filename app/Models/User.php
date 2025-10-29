@@ -27,15 +27,15 @@ class User extends Authenticatable
         'email',
         'password'];
 
-    // Roles
-    public function roles()
-    {
-        return $this->belongsToMany(Role::class, 'role_user');
-    }
-
     public function hasRole($role)
     {
         return $this->roles()->where('name', $role)->exists();
+    }
+
+    // Roles
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
     }
 
     // If the user is an instructor

@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CalendarScheduleController;
 use App\Http\Controllers\ClassCourseController;
 use App\Http\Controllers\ClassroomController;
+use App\Http\Controllers\ClassScheduleController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ProgramController;
@@ -91,6 +92,15 @@ Route::middleware(['auth:sanctum', 'role:Administrator'])
         Route::get('/', [CalendarScheduleController::class, 'index']); // list all schedules
         Route::post('/', [CalendarScheduleController::class, 'store']); // create schedules
     });
+
+    Route::prefix('calendar-schedules')->group(function () {
+        Route::get('/create', [ClassScheduleController::class, 'create']); // json for create class schedules modal form
+        Route::get('/{id}', [ClassScheduleController::class, 'show']); // view details of class_schedules->id == {id}
+        Route::put('/{id}', [ClassScheduleController::class, 'update']); // edit details of class_schedules->id == {id}
+        Route::delete('/{id}', [ClassScheduleController::class, 'destroy']); // delete class_schedules->id == {id}
+        Route::get('/', [ClassScheduleController::class, 'index']); // list all class schedules
+        Route::post('/', [ClassScheduleController::class, 'store']); // create class schedules
+    });
 });
 
 // api/instructor
@@ -143,6 +153,11 @@ Route::middleware(['auth:sanctum', 'role:Instructor'])
         Route::get('/create', [CalendarScheduleController::class, 'create']); // json for create schedules modal form
         Route::get('/', [AnnouncementController::class, 'index']); // list all announcements
     });
+
+    Route::prefix('class-schedules')->group(function () {
+        Route::get('/', [ClassScheduleController::class, 'index']); // show their respective schedules
+        Route::get('/{id}', [ClassScheduleController::class, 'show']); // view details of a schedule
+    });
 });
 
 // api/officer
@@ -181,5 +196,10 @@ Route::middleware(['auth:sanctum', 'role:Student,Officer'])
     Route::prefix('calendar-schedules')->group(function () {
         Route::get('/create', [CalendarScheduleController::class, 'create']); // json for create schedules modal form
         Route::get('/', [AnnouncementController::class, 'index']); // list all announcements
+    });
+
+    Route::prefix('class-schedules')->group(function () {
+        Route::get('/', [ClassScheduleController::class, 'index']); // show their respective schedules
+        Route::get('/{id}', [ClassScheduleController::class, 'show']); // view details of a schedule
     });
 });
