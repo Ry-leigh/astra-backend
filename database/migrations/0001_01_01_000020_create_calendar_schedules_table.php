@@ -12,12 +12,14 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->enum('schedule_type', ['general', 'class', 'course', 'task', 'exam', 'meeting']);
-            $table->unsignedBigInteger('related_id')->nullable();
-            $table->dateTime('start_datetime');
-            $table->dateTime('end_datetime')->nullable();
-            $table->boolean('is_all_day')->default(false);
-            $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
+            $table->date('start_date');
+            $table->date('end_date')->nullable(); // defaults to start_date if same-day
+            $table->boolean('all_day')->default(false);
+            $table->time('start_time')->nullable(); // null if all-day
+            $table->time('end_time')->nullable(); // null if all-day
+            $table->enum('category', ['holiday', 'event', 'meeting', 'exam', 'makeup_class']);
+            $table->enum('repeats', ['none', 'daily', 'weekly', 'monthly', 'yearly']);
+            $table->foreignId('created_by')->constrained('users')->nullable()->nullOnDelete();
             $table->timestamps();
         });
     }

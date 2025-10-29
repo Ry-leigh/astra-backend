@@ -24,13 +24,18 @@ class AttendanceRecord extends Model
         return $this->belongsTo(Student::class);
     }
 
-    public function classSession()
+    public function classSchedule()
     {
-        return $this->belongsTo(ClassSession::class);
+        return $this->belongsTo(ClassSchedule::class);
     }
 
     public function marker()
     {
         return $this->belongsTo(User::class, 'marked_by');
+    }
+
+    public function substituteInstructor()
+    {
+        return $this->belongsTo(User::class, 'substitute_id');
     }
 }
