@@ -4,6 +4,7 @@ use App\Http\Controllers\AnnouncementController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CalendarScheduleController;
 use App\Http\Controllers\ClassCourseController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\CourseController;
@@ -81,7 +82,15 @@ Route::middleware(['auth:sanctum', 'role:Administrator'])
         Route::post('/', [EnrollmentController::class, 'store']);
         Route::delete('/{id}', [EnrollmentController::class, 'destroy']);
     });
-
+    
+    Route::prefix('calendar-schedules')->group(function () {
+        Route::get('/create', [CalendarScheduleController::class, 'create']); // json for create schedules modal form
+        Route::get('/{id}', [CalendarScheduleController::class, 'show']); // view details of schedules->id == {id}
+        Route::put('/{id}', [CalendarScheduleController::class, 'update']); // edit details of schedules->id == {id}
+        Route::delete('/{id}', [CalendarScheduleController::class, 'destroy']); // delete schedules->id == {id}
+        Route::get('/', [CalendarScheduleController::class, 'index']); // list all schedules
+        Route::post('/', [CalendarScheduleController::class, 'store']); // create schedules
+    });
 });
 
 // api/instructor
@@ -130,6 +139,10 @@ Route::middleware(['auth:sanctum', 'role:Instructor'])
         Route::delete('/{id}', [EnrollmentController::class, 'destroy']);
     });
 
+    Route::prefix('calendar-schedules')->group(function () {
+        Route::get('/create', [CalendarScheduleController::class, 'create']); // json for create schedules modal form
+        Route::get('/', [AnnouncementController::class, 'index']); // list all announcements
+    });
 });
 
 // api/officer
@@ -165,4 +178,8 @@ Route::middleware(['auth:sanctum', 'role:Student,Officer'])
         });
     });
 
+    Route::prefix('calendar-schedules')->group(function () {
+        Route::get('/create', [CalendarScheduleController::class, 'create']); // json for create schedules modal form
+        Route::get('/', [AnnouncementController::class, 'index']); // list all announcements
+    });
 });
