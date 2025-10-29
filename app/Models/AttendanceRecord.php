@@ -34,7 +34,7 @@ class AttendanceRecord extends Model
         return $this->belongsTo(User::class, 'marked_by');
     }
 
-    public function substituteInstructor()
+    public function substitute()
     {
         return $this->belongsTo(User::class, 'substitute_id');
     }
