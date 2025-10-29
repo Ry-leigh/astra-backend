@@ -56,6 +56,16 @@ class User extends Authenticatable
         return $this->hasMany(Announcement::class, 'created_by');
     }
 
+    public function markedAttendances() // for students
+    {
+        return $this->hasMany(AttendanceRecord::class, 'marked_by');
+    }
+
+    public function markedSessions() // for instructors
+    {
+        return $this->hasMany(ClassSession::class, 'marked_by');
+    }
+
     // Notifications
     public function notifications()
     {

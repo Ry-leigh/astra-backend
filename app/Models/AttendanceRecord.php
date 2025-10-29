@@ -12,21 +12,25 @@ class AttendanceRecord extends Model
     protected $fillable = [
         'student_id',
         'class_session_id',
-        'instructor_time_in',
-        'instructor_time_out',
         'status',
-        'student_time_in',
+        'time_in',
         'remarks',
-        'marked_by'];
+        'marked_by',
+    ];
 
     public function student()
     {
         return $this->belongsTo(Student::class);
     }
 
-    public function classSchedule()
+    public function classSession()
     {
-        return $this->belongsTo(ClassSchedule::class);
+        return $this->belongsTo(ClassSession::class);
+    }
+
+    public function markedBy()
+    {
+        return $this->belongsTo(User::class, 'marked_by');
     }
 
     public function marker()

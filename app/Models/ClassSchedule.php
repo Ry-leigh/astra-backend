@@ -21,8 +21,23 @@ class ClassSchedule extends Model
         return $this->belongsTo(ClassCourse::class);
     }
 
+    public function classSessions()
+    {
+        return $this->hasMany(ClassSession::class);
+    }
+
+    public function instructor()
+    {
+        return $this->belongsTo(Instructor::class);
+    }
+
     public function attendanceRecords()
     {
         return $this->hasMany(AttendanceRecord::class);
+    }
+
+    public function calendarSchedules()
+    {
+        return $this->hasMany(CalendarSchedule::class);
     }
 }
