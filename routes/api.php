@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\AttendanceRecordController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -109,6 +110,13 @@ Route::middleware(['auth:sanctum', 'role:Administrator'])
         Route::delete('/{id}', [ClassSessionController::class, 'destroy']);
         Route::post('/', [ClassSessionController::class, 'store']);
     });
+
+    Route::prefix('attendance-records')->group(function () {
+        Route::get('/{sessionId?}', [AttendanceRecordController::class, 'index']);
+        Route::put('/{id}', [AttendanceRecordController::class, 'update']);
+        Route::delete('/{id}', [AttendanceRecordController::class, 'destroy']);
+        Route::post('/', [AttendanceRecordController::class, 'store']);
+    });
 });
 
 // api/instructor
@@ -172,6 +180,12 @@ Route::middleware(['auth:sanctum', 'role:Instructor'])
         Route::put('/{id}', [ClassSessionController::class, 'update']);
         Route::post('/', [ClassSessionController::class, 'store']);
     });
+
+    Route::prefix('attendance-records')->group(function () {
+        Route::get('/{sessionId?}', [AttendanceRecordController::class, 'index']);
+        Route::put('/{id}', [AttendanceRecordController::class, 'update']);
+        Route::post('/', [AttendanceRecordController::class, 'store']);
+    });
 });
 
 // api/officer
@@ -185,6 +199,11 @@ Route::middleware(['auth:sanctum', 'role:Officer'])
         Route::post('/', [ClassSessionController::class, 'store']);
     });
 
+    Route::prefix('attendance-records')->group(function () {
+        Route::get('/{sessionId?}', [AttendanceRecordController::class, 'index']);
+        Route::put('/{id}', [AttendanceRecordController::class, 'update']);
+        Route::post('/', [AttendanceRecordController::class, 'store']);
+    });
 });
 
 
@@ -223,5 +242,9 @@ Route::middleware(['auth:sanctum', 'role:Student,Officer'])
 
     Route::prefix('class-sessions')->group(function () {
         Route::get('/{classScheduleId}', [ClassSessionController::class, 'index']);
+    });
+
+    Route::prefix('attendance-records')->group(function () {
+        Route::get('/{sessionId?}', [AttendanceRecordController::class, 'index']);
     });
 });
