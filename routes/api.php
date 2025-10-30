@@ -35,6 +35,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/read-all', [NotificationController::class, 'markAllAsRead']);
         Route::delete('/{id}', [NotificationController::class, 'destroy']);
     });
+
+    Route::prefix('settings')->group(function () {
+        Route::get('/preferences', [SettingsController::class, 'getPreferences']);
+        Route::put('/preferences', [SettingsController::class, 'updatePreferences']);
+        Route::put('/password', [SettingsController::class, 'changePassword']);
+    });
 });
 // api/admin
 Route::middleware(['auth:sanctum', 'role:Administrator'])
