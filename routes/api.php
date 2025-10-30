@@ -15,6 +15,7 @@ use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\TaskStatusController;
+use App\Http\Controllers\UserController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -117,6 +118,8 @@ Route::middleware(['auth:sanctum', 'role:Administrator'])
         Route::delete('/{id}', [AttendanceRecordController::class, 'destroy']);
         Route::post('/', [AttendanceRecordController::class, 'store']);
     });
+
+    Route::apiResource('users', UserController::class);
 });
 
 // api/instructor
