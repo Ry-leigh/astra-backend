@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('class_schedule_id')->constrained('class_schedules')->cascadeOnDelete();
             $table->foreignId('substitute_id')->nullable()->constrained('users')->nullOnDelete(); // optional substitute instructor
             $table->date('session_date'); // actual date of the class
+            $table->boolean('cancelled')->default(false);
             $table->time('time_in')->nullable();
             $table->time('time_out')->nullable();
             $table->string('remarks')->nullable();

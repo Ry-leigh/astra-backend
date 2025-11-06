@@ -9,6 +9,13 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    public function user(Request $request)
+    {
+        $user = User::findOrFail($request->user()->id);
+        $user = $user->load('roles');
+        return response()->json(['user' => $user]);
+    }
+
     public function login(Request $request)
     {
         // user input validation
@@ -22,9 +29,10 @@ class AuthController extends Controller
 
         // user email and password verification
         if (! $user || ! Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Credentials are incorrect.']
-            ]);
+            return response()->json([
+                'error' => 'invalid_credentials',
+                'message' => 'Credentials are incorrect.'
+            ], 401);
         }
 
         // user session

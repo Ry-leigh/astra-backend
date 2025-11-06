@@ -29,13 +29,19 @@ class ClassScheduleController extends Controller
         }
 
         else {
-            return response()->json(['message' => 'Unauthorized or no schedules found.'], 403);
+            return response()->json(['message' => 'No schedules found.']);
         }
 
         return response()->json($schedules);
     }
 
     public function show($id) {
+        $user = Auth::user();
+
+        if (!$user->hasRole('Administrator')) {
+            return response()->json(['message' => 'Not Found'], 404);
+        }
+
         $schedule = ClassSchedule::with(['classCourse', 'instructor'])->findOrFail($id);
         return response()->json($schedule);
     }
@@ -68,7 +74,7 @@ class ClassScheduleController extends Controller
         $user = Auth::user();
 
         if (!$user->hasRole('Administrator')) {
-            return response()->json(['message' => 'Forbidden.'], 403);
+            return response()->json(['message' => 'Forbidden'], 403);
         }
 
         $schedule = ClassSchedule::findOrFail($id);
@@ -85,7 +91,7 @@ class ClassScheduleController extends Controller
         $schedule->update($validated);
 
         return response()->json([
-            'message' => 'Class schedule updated successfully.',
+            'message' => 'Class schedule updated successfully',
             'data' => $schedule,
         ]);
     }
@@ -94,12 +100,12 @@ class ClassScheduleController extends Controller
         $user = Auth::user();
 
         if (!$user->hasRole('Administrator')) {
-            return response()->json(['message' => 'Forbidden.'], 403);
+            return response()->json(['message' => 'Forbidden'], 403);
         }
 
         $schedule = ClassSchedule::findOrFail($id);
         $schedule->delete();
 
-        return response()->json(['message' => 'Class schedule deleted successfully.']);
+        return response()->json(['message' => 'Class schedule deleted successfully']);
     }
 }

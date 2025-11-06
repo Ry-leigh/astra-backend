@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\Validator;
 
 class ClassroomController extends Controller
 {
-    // Admin: view all classrooms under a specific program
-    public function adminIndex($programId)
+    // view all classrooms under a specific program
+    public function index($programId)
     {
         $program = Program::findOrFail($programId);
 
@@ -28,32 +28,32 @@ class ClassroomController extends Controller
     }
 
     // Instructor: view all classrooms they’re teaching in
-    public function instructorIndex()
-    {
-        $user = Auth::user();
-        $instructor = $user->instructor;
+    // public function instructorIndex()
+    // {
+    //     $user = Auth::user();
+    //     $instructor = $user->instructor;
 
-        if (!$instructor) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Instructor profile not found.'
-            ], 403);
-        }
+    //     if (!$instructor) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Instructor profile not found.'
+    //         ], 403);
+    //     }
 
-        // Fetch all class courses tied to this instructor
-        $classCourses = ClassCourse::with([
-            'course:id,name,code,description',
-            'classroom:id,program_id,year_level,section,academic_year',
-            'classroom.program:id,name',
-        ])
-        ->where('instructor_id', $instructor->id)
-        ->get(['id', 'course_id', 'classroom_id', 'instructor_id', 'semester']);
+    //     // Fetch all class courses tied to this instructor
+    //     $classCourses = ClassCourse::with([
+    //         'course:id,name,code,description',
+    //         'classroom:id,program_id,year_level,section,academic_year',
+    //         'classroom.program:id,name',
+    //     ])
+    //     ->where('instructor_id', $instructor->id)
+    //     ->get(['id', 'course_id', 'classroom_id', 'instructor_id', 'semester']);
 
-        return response()->json([
-            'success' => true,
-            'data' => $classCourses
-        ]);
-    }
+    //     return response()->json([
+    //         'success' => true,
+    //         'data' => $classCourses
+    //     ]);
+    // }
 
     public function store(Request $request) {
         $validated = $request->validate([

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->time('start_time')->nullable(); // null if all-day
             $table->time('end_time')->nullable(); // null if all-day
             $table->enum('category', ['holiday', 'event', 'meeting', 'exam', 'makeup_class']);
-            $table->enum('repeats', ['none', 'daily', 'weekly', 'monthly', 'yearly']);
+            $table->enum('repeats', ['none', 'daily', 'weekly', 'monthly', 'yearly'])->default('none');
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });

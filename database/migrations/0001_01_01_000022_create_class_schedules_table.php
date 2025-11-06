@@ -15,7 +15,6 @@ return new class extends Migration
             $table->enum('day_of_week', ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']);
             $table->time('start_time');
             $table->time('end_time');
-            $table->boolean('cancelled')->default(false);
             $table->timestamps();
         });
     }

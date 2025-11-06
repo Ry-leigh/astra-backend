@@ -10,41 +10,35 @@ use Illuminate\Support\Facades\Auth;
 
 class EnrollmentController extends Controller
 {
-    public function store(Request $request) {
-        $validated = $request->validate([
-            'class_course_id' => 'required|exists:class_courses,id',
-            'student_id'      => 'required|exists:students,id',
-        ]);
-
+    public function store(Request $request, $id)
+    {
         $user = Auth::user();
 
-        $classCourse = ClassCourse::findOrFail($validated['class_course_id']);
+        $validated = $request->validate([
+            'student_id' => 'required|exists:students,id',
+        ]);
 
-        $roleNames = $user->roles->pluck('name')->toArray();
-        $roleIds = $user->roles->pluck('id')->toArray();
+        $classCourse = ClassCourse::findOrFail($id);
 
-        if (in_array('Instructor', $roleNames)) {
-            $instructor = $user->instructor;
-
-            if (!$instructor) {
-                return response()->json(['message' => 'Instructor profile not found.'], 403);
-            }
-
-            // Ensure instructor owns this class course
-            if ($classCourse->instructor_id !== $instructor->id) {
-                return response()->json([
-                    'message' => 'You can only enroll students in your own classes.'
-                ], 403);
+        if ($user->hasRole('Instructor')) {
+            if ($classCourse->instructor_id !== $user->instructor->id) {
+                return response()->json(['message' => 'You can only enroll students in your own classes.'], 403);
             }
         }
 
-        // Prevent duplicate enrollment
-        $exists = Enrollment::where($validated)->exists();
+        $exists = Enrollment::where([
+            'class_course_id' => $id,
+            'student_id' => $validated['student_id'],
+        ])->exists();
+
         if ($exists) {
             return response()->json(['message' => 'Student already enrolled.'], 409);
         }
 
-        $enrollment = Enrollment::create($validated);
+        $enrollment = Enrollment::create([
+            'class_course_id' => $id,
+            'student_id' => $validated['student_id'],
+        ]);
 
         return response()->json(['message' => 'Student enrolled successfully.', 'data' => $enrollment], 201);
     }

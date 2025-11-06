@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('announcement_targets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('announcement_id')->constrained('announcements')->cascadeOnDelete();
-            $table->enum('target_type', ['global', 'role', 'program', 'classroom', 'course']);
+            $table->enum('target_type', ['global', 'role', 'program', 'classroom', 'course']); // make global to general, role to department, and add access level 
             $table->unsignedBigInteger('target_id')->nullable();
             $table->timestamps();
         });

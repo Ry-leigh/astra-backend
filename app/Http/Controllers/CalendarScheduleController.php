@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 class CalendarScheduleController extends Controller
 {
-    public function index(Request $request) {
+    public function index() {
         $user = Auth::user();
 
         $roleNames = $user->roles->pluck('name')->toArray();

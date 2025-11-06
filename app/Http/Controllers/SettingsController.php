@@ -7,11 +7,23 @@ use Illuminate\Support\Facades\Hash;
 
 class SettingsController extends Controller
 {
-    public function getPreferences(Request $request) {
-        return response()->json($request->user()->preferences);
+    /**
+     * Retrieve user notification and general preferences.
+     */
+    public function getPreferences(Request $request)
+    {
+        $user = $request->user();
+
+        return response()->json([
+            'preferences' => $user->preferences,
+        ]);
     }
 
-    public function updatePreferences(Request $request) {
+    /**
+     * Update user notification preferences.
+     */
+    public function updatePreferences(Request $request)
+    {
         $data = $request->validate([
             'notify_email' => 'boolean',
             'notify_in_app' => 'boolean',
@@ -22,23 +34,34 @@ class SettingsController extends Controller
             $data
         );
 
-        return response()->json(['message' => 'Preferences updated successfully']);
+        return response()->json([
+            'message' => 'Preferences updated successfully.',
+            'preferences' => $request->user()->fresh()->preferences,
+        ]);
     }
 
-    public function changePassword(Request $request) {
+    /**
+     * Allow user to securely change their password.
+     */
+    public function changePassword(Request $request)
+    {
         $data = $request->validate([
             'current_password' => 'required',
             'new_password' => 'required|min:6|confirmed',
         ]);
 
-        if (!Hash::check($data['current_password'], $request->user()->password)) {
-            return response()->json(['error' => 'Current password incorrect'], 422);
+        $user = $request->user();
+
+        if (!Hash::check($data['current_password'], $user->password)) {
+            return response()->json([
+                'error' => 'Current password is incorrect.',
+            ], 422);
         }
 
-        $request->user()->update([
+        $user->update([
             'password' => Hash::make($data['new_password']),
         ]);
 
-        return response()->json(['message' => 'Password updated successfully']);
+        return response()->json(['message' => 'Password updated successfully.']);
     }
 }

@@ -14,7 +14,13 @@ class ProgramController extends Controller
         return response()->json(['success' => true, 'data' => $programs]);
     }
 
-    public function store(Request $request) {
+    public function show($id) {
+        $program = Program::findOrFail($id);
+
+        return response()->json(['success' => true, 'data' => $program]);
+    }
+
+    public function store(Request $request) {   
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|unique:programs,name',
             'description' => 'nullable|string',
