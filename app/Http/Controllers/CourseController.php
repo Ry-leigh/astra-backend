@@ -2,16 +2,42 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ClassCourse;
+use App\Models\Classroom;
 use App\Models\Course;
+use App\Models\Program;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class CourseController extends Controller
 {
-    public function index() {
-        $courses = Course::all();
+    public function index($classroomId)
+    {
+        $classroom = Classroom::with('program')->findOrFail($classroomId);
 
-        return response()->json(['courses' => $courses]);
+        $programName = $classroom->program ? $classroom->program->name : 'Unknown Program';
+        $yearLevel = $classroom->year_level;
+        $section = $classroom->section ? $classroom->section : '';
+        $classroomName = trim("{$programName} {$yearLevel}{$section}");
+
+        $courses = ClassCourse::with([
+            'course:id,name,code,description',
+            'instructor.user:id,sex,first_name,last_name,email'
+        ])
+        ->where('classroom_id', $classroom->id)
+        ->orderBy('course_id')
+        ->get();
+
+        return response()->json([
+            'success' => true,
+            'classroom' => [
+                'id' => $classroom->id,
+                'name' => $classroomName,
+                'program' => $programName,
+                'academic_year' => $classroom->academic_year
+            ],
+            'courses' => $courses
+        ]);
     }
 
     public function store(Request $request) {

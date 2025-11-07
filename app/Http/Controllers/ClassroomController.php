@@ -18,11 +18,13 @@ class ClassroomController extends Controller
 
         $classrooms = Classroom::with('program:id,name')
             ->where('program_id', $program->id)
+            ->orderBy('year_level')
+            ->orderBy('section')
             ->get(['id', 'program_id', 'year_level', 'section', 'academic_year']);
 
         return response()->json([
             'success' => true,
-            'program' => $program->name,
+            'program' => $program,
             'data' => $classrooms,
         ]);
     }

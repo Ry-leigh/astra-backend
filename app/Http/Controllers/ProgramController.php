@@ -10,7 +10,7 @@ class ProgramController extends Controller
 {
     public function index() {
         $programs = Program::all();
-
+        $programs = Program::orderBy('name')->get();
         return response()->json(['success' => true, 'data' => $programs]);
     }
 
