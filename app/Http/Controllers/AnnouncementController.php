@@ -14,7 +14,9 @@ use Illuminate\Support\Facades\DB;
 class AnnouncementController extends Controller
 {
     public function index() {
-        return response()->json(Announcement::with('targets')->visibleTo(Auth::user())->latest()->get());
+        $announcements = Announcement::with('targets')->visibleTo(Auth::user())->latest()->get();
+
+        return response()->json(['success' => true, 'announcements' => $announcements]);
     }
 
     public function show($id) {

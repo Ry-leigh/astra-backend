@@ -12,7 +12,10 @@ class ClassAnnouncementController extends Controller
 {
     // ---------- class-specific announcements CRUD methods ----------
     public function index($classId) {
-        $classCourse = ClassCourse::findOrFail($classId);
+        $classCourse = ClassCourse::with([
+            'course:id,name,code,description',
+            'instructor.user:id,first_name,last_name,email',
+        ])->findOrFail($classId);
 
         $announcements = Announcement::whereHas('targets', function ($q) use ($classId) {
             $q->where('target_type', 'course')
@@ -21,8 +24,8 @@ class ClassAnnouncementController extends Controller
 
         return response()->json([
             'success' => true,
-            'class_course_id' => $classCourse->id,
-            'data' => $announcements,
+            'class' => $classCourse,
+            'announcements' => $announcements,
         ]);
     }
 

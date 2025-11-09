@@ -20,9 +20,9 @@ class ClassScheduleController extends Controller
                 ->where('instructor_id', $user->instructor->id)
                 ->get();
         }
+        elseif ($user->hasRole(['Officer','Student']) && $user->student) {
 
-        elseif ($user->hasRole('Student') && $user->student) {
-            $classIds = $user->student->classCourses()->pluck('id');
+            $classIds = $user->student->enrollments->pluck('class_course_id');
             $schedules = ClassSchedule::with(['classCourse', 'instructor'])
                 ->whereIn('class_course_id', $classIds)
                 ->get();

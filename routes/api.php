@@ -174,8 +174,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     */
     Route::apiResource('notifications', NotificationController::class);
 
-    Route::apiResource('users', UserController::class)->middleware('role:Administrator');
-
     /*
     |--------------------------------------------------------------------------
     | User Settings

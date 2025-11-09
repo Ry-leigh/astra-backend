@@ -10,11 +10,14 @@ use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
-    public function index($classId) {
+    public function index($classCourseId) {
         $user = Auth::user();
 
-        if ($user->hasRole(['admin', 'instructor'])) {
-            $classCourse = ClassCourse::findOrFail($classId);
+        if ($user->hasRole(['Administrator', 'instructor'])) {
+            $classCourse = ClassCourse::with([
+                'course:id,name,code,description',
+                'instructor.user:id,first_name,last_name,email',
+            ])->findOrFail($classCourseId);
 
             $isInstructor = $user->roles->contains('name', 'Instructor');
             
@@ -27,49 +30,55 @@ class TaskController extends Controller
 
             $today = Carbon::today();
 
-            $past = Task::where('class_course_id', $classId)
+            $past = Task::where('class_course_id', $classCourseId)
                 ->whereDate('due_date', '<', $today)
                 ->orderBy('due_date', 'desc')
                 ->get();
 
-            $todayTasks = Task::where('class_course_id', $classId)
+            $todayTasks = Task::where('class_course_id', $classCourseId)
                 ->whereDate('due_date', '=', $today)
                 ->orderBy('due_time', 'asc')
                 ->get();
 
-            $upcoming = Task::where('class_course_id', $classId)
+            $upcoming = Task::where('class_course_id', $classCourseId)
                 ->whereDate('due_date', '>', $today)
                 ->orderBy('due_date', 'asc')
                 ->get();
 
             return response()->json([
                 'success' => true,
-                'class_course_id' => $classId,
-                'data' => [
-                    'past' => $past,
+                'class' => $classCourse,
+                'tasks' => [
                     'today' => $todayTasks,
                     'upcoming' => $upcoming,
-                ]]);
+                    'finished' => $past,
+                ]
+            ]);
+        } else {
+            $student = $user->student;
         }
 
-        if ($user->hasRole('student')) {
-            return $this->studentIndex($classId);
+        if ($student) {
+            return $this->studentIndex($classCourseId);
+        } else {
+            return response()->json(['message' => 'Student profile not found.'], 403);
         }
     }
 
-    public function studentIndex($classId) {
+    public function studentIndex($classCourseId) {
         $user = Auth::user();
         $student = $user->student;
 
-        if (!$student) {
-            return response()->json(['message' => 'Student profile not found.'], 403);
-        }
+        $classCourse = ClassCourse::with([
+                'course:id,name,code,description',
+                'instructor.user:id,first_name,last_name,email',
+            ])->findOrFail($classCourseId);
 
         $today = Carbon::today();
 
         $tasks = Task::with(['statuses' => function ($q) use ($student) {
             $q->where('student_id', $student->id);
-        }])->where('class_course_id', $classId)->get();
+        }])->where('class_course_id', $classCourseId)->get();
 
         $finished = $tasks->filter(function ($t) use ($student) {
             return $t->statuses->first()?->is_finished === true;
@@ -95,12 +104,12 @@ class TaskController extends Controller
 
         return response()->json([
             'success' => true,
-            'class_course_id' => $classId,
-            'data' => [
-                'finished' => $finished,
+            'class' => $classCourse,
+            'tasks' => [
                 'overdue' => $overdue,
-                'due_today' => $dueToday,
+                'today' => $dueToday,
                 'upcoming' => $upcoming,
+                'finished' => $finished,
             ],
         ]);
     }

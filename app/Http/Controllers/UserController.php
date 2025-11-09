@@ -13,8 +13,8 @@ use Illuminate\Validation\Rule;
 class UserController extends Controller
 {
     public function index() {
-        $users = User::with(['roles', 'instructor.program', 'student.program'])->get();
-        return response()->json($users);
+        $users = User::with(['roles', 'instructor', 'student'])->get();
+        return response()->json(['success' => true, 'users' => $users]);
     }
 
     public function store(Request $request) {

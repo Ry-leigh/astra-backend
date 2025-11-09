@@ -26,7 +26,7 @@ class ClassController extends Controller
                 $query->where('instructor_id', $user->instructor->id);
                 break;
 
-            case $user->hasRole('Student') && $user->student:
+            case $user->hasRole('Officer') && $user->student:
                 $classIds = $user->student->enrollments()
                     ->with('classCourse:id')
                     ->get()
@@ -34,11 +34,18 @@ class ClassController extends Controller
                 $query->whereIn('id', $classIds);
                 break;
 
+            case $user->hasRole('Student') && $user->student:
+                $classIds = $user->student->enrollments()
+                    ->with('classCourse:id')
+                    ->get()
+                    ->pluck('classCourse.id');
+                $query->whereIn('id', $classIds);
+                break;
             default:
                 return response()->json(['message' => 'Unauthorized.'], 403);
         }
 
-        return response()->json($query->get());
+        return response()->json(['success' => true, 'classes' => $query->get()]);
     }
 
     // Show details of a specific class
@@ -48,8 +55,9 @@ class ClassController extends Controller
 
         $classCourse = ClassCourse::with([
             'course:id,name,code,description',
-            'instructor.user:id,first_name,last_name,email',
-            'enrollments.student.user:id,first_name,last_name,email',
+            'instructor.user:id,sex,first_name,last_name,email',
+            'enrollments.student.user:id,sex,first_name,last_name,email',
+            'enrollments.student.user.roles:id,name'
         ])->findOrFail($id);
 
         // Role-based access validation
@@ -70,6 +78,6 @@ class ClassController extends Controller
             }
         }
 
-        return response()->json($classCourse);
+        return response()->json(['success' => true, 'class' => $classCourse]);
     }
 }

@@ -14,83 +14,337 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = User::create([
-            'first_name' => 'Mira',
-            'last_name'  => 'Langford',
-            'sex'        => 'F',
-            'address'    => '',
-            'email'      => 'admin@onetap.test',
-            'password'   => Hash::make('admin123'),
+        User::insert([
+            [
+                'id' => 1,
+                'first_name' => 'Admin',
+                'middle_name' => '',
+                'last_name' => 'System',
+                'sex' => 'M',
+                'address' => '42 Infinite Loop, Silicon Valley, CA 94043',
+                'email' => 'system@admin.test',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 2,
+                'first_name' => 'Gian Carlo',
+                'middle_name' => '',
+                'last_name' => 'Gallon',
+                'sex' => 'M',
+                'address' => '1600 Pennsyltucky Ave, Washington, DC 20500',
+                'email' => 'giancarlo.gallon@laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 3,
+                'first_name' => 'Rene Vee',
+                'middle_name' => 'R',
+                'last_name' => 'Sahagun',
+                'sex' => 'M',
+                'address' => '742 Evergreen Terrace, Springfield, IL 62704',
+                'email' => 'renesahagun@laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 4,
+                'first_name' => 'Mark',
+                'middle_name' => '',
+                'last_name' => 'Hernandez',
+                'sex' => 'M',
+                'address' => '123 Main Street, Your Imagination, ST 99999',
+                'email' => 'markhernandez@laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 5,
+                'first_name' => 'Katrina',
+                'middle_name' => '',
+                'last_name' => 'Maquilan',
+                'sex' => 'F',
+                'address' => '42 Infinite Loop, Silicon Valley, CA 94043',
+                'email' => 'katrinamaquilan@laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 6,
+                'first_name' => 'Ruth',
+                'middle_name' => '',
+                'last_name' => 'Soriano',
+                'sex' => 'F',
+                'address' => '1600 Pennsyltucky Ave, Washington, DC 20500',
+                'email' => 'ruthsoriano@laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 7,
+                'first_name' => 'Ma. Giselle',
+                'middle_name' => '',
+                'last_name' => 'Dionisio',
+                'sex' => 'F',
+                'address' => '742 Evergreen Terrace, Springfield, IL 62704',
+                'email' => 'magiselledionisio@laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 8,
+                'first_name' => 'Diana',
+                'middle_name' => '',
+                'last_name' => 'Tejada',
+                'sex' => 'F',
+                'address' => '123 Main Street, Your Imagination, ST 99999',
+                'email' => 'diana.tejada@laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 9,
+                'first_name' => 'Elmer',
+                'middle_name' => '',
+                'last_name' => 'Alvarado',
+                'sex' => 'M',
+                'address' => '42 Infinite Loop, Silicon Valley, CA 94043',
+                'email' => 'elmeralvarado@laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 10,
+                'first_name' => 'Ryan Aaron',
+                'middle_name' => 'Raguine',
+                'last_name' => 'Dela Cruz',
+                'sex' => 'M',
+                'address' => '1600 Pennsyltucky Ave, Washington, DC 20500',
+                'email' => 'ryanaarondelacruz@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 11,
+                'first_name' => 'Vincent Lee',
+                'middle_name' => 'Torreda',
+                'last_name' => 'Duriga',
+                'sex' => 'M',
+                'address' => '742 Evergreen Terrace, Springfield, IL 62704',
+                'email' => 'vincentleeduriga@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 12,
+                'first_name' => 'Rasheed Gavin',
+                'middle_name' => 'Mogro',
+                'last_name' => 'Esponga',
+                'sex' => 'M',
+                'address' => '123 Main Street, Your Imagination, ST 99999',
+                'email' => 'rasheedgavinesponga@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 13,
+                'first_name' => 'Garrell',
+                'middle_name' => 'Bola',
+                'last_name' => 'Macarilay',
+                'sex' => 'M',
+                'address' => '42 Infinite Loop, Silicon Valley, CA 94043',
+                'email' => 'garrellmacarilay@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 14,
+                'first_name' => 'Rolando',
+                'middle_name' => 'Monticalbo',
+                'last_name' => 'Majait',
+                'sex' => 'M',
+                'address' => '1600 Pennsyltucky Ave, Washington, DC 20500',
+                'email' => 'rolandomajait@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 15,
+                'first_name' => 'Jeremy',
+                'middle_name' => 'Suing',
+                'last_name' => 'Ortega',
+                'sex' => 'M',
+                'address' => '742 Evergreen Terrace, Springfield, IL 62704',
+                'email' => 'jeremyortega@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 16,
+                'first_name' => 'Joshua',
+                'middle_name' => 'Maralit',
+                'last_name' => 'Pateña',
+                'sex' => 'M',
+                'address' => '123 Main Street, Your Imagination, ST 99999',
+                'email' => 'joshuapatena@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 17,
+                'first_name' => 'Mark Jason',
+                'middle_name' => 'Lajot',
+                'last_name' => 'Patron',
+                'sex' => 'M',
+                'address' => '42 Infinite Loop, Silicon Valley, CA 94043',
+                'email' => 'markjasonpatron@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 18,
+                'first_name' => 'Juan Miguel',
+                'middle_name' => 'Hero',
+                'last_name' => 'Ramirez',
+                'sex' => 'M',
+                'address' => '1600 Pennsyltucky Ave, Washington, DC 20500',
+                'email' => 'juanmiguelramirez@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 19,
+                'first_name' => 'John Russel',
+                'middle_name' => 'Galang',
+                'last_name' => 'Regalado',
+                'sex' => 'M',
+                'address' => '742 Evergreen Terrace, Springfield, IL 62704',
+                'email' => 'johnrusselregalado@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 20,
+                'first_name' => 'Romar',
+                'middle_name' => 'Dumo',
+                'last_name' => 'Samson',
+                'sex' => 'M',
+                'address' => '123 Main Street, Your Imagination, ST 99999',
+                'email' => 'romarsamson@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 21,
+                'first_name' => 'Lowe David',
+                'middle_name' => 'Camarines',
+                'last_name' => 'Tubat',
+                'sex' => 'M',
+                'address' => '42 Infinite Loop, Silicon Valley, CA 94043',
+                'email' => 'louiedavidtubat@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 22,
+                'first_name' => 'Evangeline',
+                'middle_name' => 'Bacalla',
+                'last_name' => 'Anggana',
+                'sex' => 'F',
+                'address' => '1600 Pennsyltucky Ave, Washington, DC 20500',
+                'email' => 'evangelineanggana@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 23,
+                'first_name' => 'Louise Anne',
+                'middle_name' => 'Surio',
+                'last_name' => 'Bechayda',
+                'sex' => 'F',
+                'address' => '742 Evergreen Terrace, Springfield, IL 62704',
+                'email' => 'louiseannebechayda@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 24,
+                'first_name' => 'Shandi Loraine',
+                'middle_name' => 'Sibul',
+                'last_name' => 'Belen',
+                'sex' => 'F',
+                'address' => '123 Main Street, Your Imagination, ST 99999',
+                'email' => 'shandilorainebelen@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 25,
+                'first_name' => 'Jocelyn',
+                'middle_name' => 'Sumayang',
+                'last_name' => 'Bendoy',
+                'sex' => 'F',
+                'address' => '42 Infinite Loop, Silicon Valley, CA 94043',
+                'email' => 'jocelynbendoy@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 26,
+                'first_name' => 'Margarette',
+                'middle_name' => 'Austria',
+                'last_name' => 'Calumpiano',
+                'sex' => 'F',
+                'address' => '1600 Pennsyltucky Ave, Washington, DC 20500',
+                'email' => 'margarettecalumpiano@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 27,
+                'first_name' => 'Lei Ann Judea',
+                'middle_name' => 'Celestial',
+                'last_name' => 'Dico',
+                'sex' => 'F',
+                'address' => '742 Evergreen Terrace, Springfield, IL 62704',
+                'email' => 'leiannjudeadico@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 28,
+                'first_name' => 'Jamela',
+                'middle_name' => 'Delauta',
+                'last_name' => 'Fernandez',
+                'sex' => 'F',
+                'address' => '123 Main Street, Your Imagination, ST 99999',
+                'email' => 'jamelafernandez@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 29,
+                'first_name' => 'Estela Mae',
+                'middle_name' => 'Denosta',
+                'last_name' => 'Jalac',
+                'sex' => 'F',
+                'address' => '42 Infinite Loop, Silicon Valley, CA 94043',
+                'email' => 'estelamaejalac@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 30,
+                'first_name' => 'Veneese Julia',
+                'middle_name' => 'Marañon',
+                'last_name' => 'Lazaraga',
+                'sex' => 'F',
+                'address' => '1600 Pennsyltucky Ave, Washington, DC 20500',
+                'email' => 'veneesejulialazaraga@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 31,
+                'first_name' => 'Eunice',
+                'middle_name' => 'Dela Rama',
+                'last_name' => 'Lugtu',
+                'sex' => 'F',
+                'address' => '742 Evergreen Terrace, Springfield, IL 62704',
+                'email' => 'eunicelugtu@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 32,
+                'first_name' => 'Vhaugnn Diane',
+                'middle_name' => 'Gonzaga',
+                'last_name' => 'Patiño',
+                'sex' => 'F',
+                'address' => '123 Main Street, Your Imagination, ST 99999',
+                'email' => 'vhaugnndiane.patino@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
+            [
+                'id' => 33,
+                'first_name' => 'Rosana Princess',
+                'middle_name' => 'Salvador',
+                'last_name' => 'Rosana',
+                'sex' => 'F',
+                'address' => '42 Infinite Loop, Silicon Valley, CA 94043',
+                'email' => 'amberprincessrosana@student.laverdad.edu.ph',
+                'password' => Hash::make('password123'),
+            ],
         ]);
-        
-        $admin->roles()->attach(Role::where('name', 'Administrator')->first());
-
-        $instructor = User::create([
-            'first_name' => 'Hana',
-            'last_name'  => 'Park',
-            'sex'        => 'F',
-            'address'    => '',
-            'email'      => 'hanapark@onetap.test',
-            'password'   => Hash::make('instructor123'),
-        ]);
-
-        $instructor->roles()->attach(Role::where('name', 'Instructor')->first());
-
-        $officer = User::create([
-            'first_name' => 'Liora',
-            'last_name'  => 'Valdez',
-            'sex'        => 'F',
-            'address'    => '',
-            'email'      => 'lioravaldez@student.onetap.test',
-            'password'   => Hash::make('student123'),
-        ]);
-
-        $officer->roles()->attach(Role::where('name', 'Officer')->first());
-
-        $student = User::create([
-            'first_name' => 'Keon',
-            'last_name'  => 'Sullivan',
-            'sex'        => 'M',
-            'address'    => '',
-            'email'      => 'student@student.onetap.test',
-            'password'   => Hash::make('student123'),
-        ]);
-
-        $student->roles()->attach(Role::where('name', 'Student')->first());
-
-        $users = User::factory()->count(200)->create();
-
-        $adminUsers         = $users->skip(4)->take(2);
-        $instructorUsers    = $users->skip(6)->take(20);
-        $officerUsers       = $users->skip(26)->take(20);
-        $studentUsers       = $users->skip(46);
-
-        $adminUsers->each(fn($user) => $user->roles()->attach(1));
-        $instructorUsers->each(fn($user) => $user->roles()->attach(2));
-        $officerUsers->each(fn($user) => $user->roles()->attach(3));
-        $studentUsers->each(fn($user) => $user->roles()->attach(4));
-
-        $instructorUsers->each(function ($user) {
-            Instructor::create([
-                'user_id'       => $user->id,
-                'program_id'    => collect([null, 1, 5])->random(),
-            ]);
-        });
-
-        $officerUsers->each(function ($user) {
-            Student::create([
-                'user_id' => $user->id,
-                'program_id' => fake()->randomElement([1, 5]),
-                'year_level' => fake()->numberBetween(1, 4),
-            ]);
-        });
-
-        $studentUsers->each(function ($user) {
-            Student::create([
-                'user_id' => $user->id,
-                'program_id' => fake()->randomElement([1, 5]),
-                'year_level' => fake()->numberBetween(1, 4),
-            ]);
-        });
     }
 }

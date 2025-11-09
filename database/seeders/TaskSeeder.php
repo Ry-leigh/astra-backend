@@ -10,6 +10,14 @@ class TaskSeeder extends Seeder
 {
     public function run(): void
     {
-        Task::factory()->count(100)->create();
+        Task::insert([
+            [
+                'class_course_id' => 6,
+                'title' => 'Quiz 1 - Finals',
+                'description' => '...',
+                'due_date' => '2025-11-07',
+                'category' => 'quiz'
+            ],
+        ]);
     }
 }
