@@ -71,7 +71,7 @@ class CalendarScheduleController extends Controller
             })->get();
         }
 
-        return response()->json($schedules);
+        return response()->json(['success' => true, 'schedules' => $schedules]);
     }
 
     public function show($id) {
@@ -120,7 +120,8 @@ class CalendarScheduleController extends Controller
 
     public function store(Request $request) {
         $user = Auth::user();
-        if (!$user->roles->contains('name', 'Administrator')) {
+
+        if (!$user->hasRole('Administrator')) {
             return response()->json(['message' => 'Unauthorized.'], 403);
         }
 
@@ -129,24 +130,32 @@ class CalendarScheduleController extends Controller
             'description' => 'nullable|string',
             'start_date' => 'required|date',
             'end_date' => 'nullable|date',
-            'all_day' => 'boolean',
-            'start_time' => 'nullable|date_format:H:i',
-            'end_time' => 'nullable|date_format:H:i',
-            'category' => 'required|in:holiday,event,meeting,exam,makeup',
+            'all_day' => 'nullable|boolean',
+            'start_time' => 'nullable|date_format:H:i:s',
+            'end_time' => 'nullable|date_format:H:i:s',
+            'category' => 'required|in:holiday,event,meeting,exam,makeup_class',
+            'repeats' => 'nullable|in:none,daily,weekly,monthly,yearly',
             'targets' => 'required|array',
             'targets.global' => 'boolean',
             'targets.roles' => 'array',
             'targets.programs' => 'array',
             'targets.classrooms' => 'array',
             'targets.class_courses' => 'array',
-        ]);
+        ]);    
 
         $schedule = CalendarSchedule::create([
-            ...$validated,
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'start_date' => $validated['start_date'],
+            'end_date' => $validated['end_date'] ?? null,
+            'all_day' => $validated['all_day'] ?? false,
+            'start_time' => $validated['start_time'] ?? null,
+            'end_time' => $validated['end_time'] ?? null,
+            'category' => $validated['category'],
+            'repeats' => $validated['repeats'] ?? 'none',
             'created_by' => $user->id,
         ]);
 
-        // 🧩 Target mapping
         $targets = [];
         if (!empty($validated['targets']['global'])) {
             $targets[] = ['target_type' => 'global', 'target_id' => null];

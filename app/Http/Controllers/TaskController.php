@@ -13,7 +13,7 @@ class TaskController extends Controller
     public function index($classCourseId) {
         $user = Auth::user();
 
-        if ($user->hasRole(['Administrator', 'instructor'])) {
+        if ($user->hasRole('Administrator') || $user->hasRole('Instructor')) {
             $classCourse = ClassCourse::with([
                 'course:id,name,code,description',
                 'instructor.user:id,first_name,last_name,email',

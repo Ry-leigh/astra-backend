@@ -67,7 +67,7 @@ class ClassController extends Controller
             }
         }
 
-        if ($user->hasRole(['Student', 'Officer'])) {
+        if ($user->hasRole('Student') || $user->hasRole('Officer')) {
             $isEnrolled = $user->student
                 ->enrollments()
                 ->where('class_course_id', $id)

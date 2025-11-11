@@ -20,10 +20,10 @@ class ClassScheduleController extends Controller
                 ->where('instructor_id', $user->instructor->id)
                 ->get();
         }
-        elseif ($user->hasRole(['Officer','Student']) && $user->student) {
+        elseif (($user->hasRole('Officer') || $user->hasRole('Student')) && $user->student) {
 
             $classIds = $user->student->enrollments->pluck('class_course_id');
-            $schedules = ClassSchedule::with(['classCourse', 'instructor'])
+            $schedules = ClassSchedule::with(['classCourse', 'classCourse.course:id,name,description,code,units', 'classCourse.instructor.user:id,sex,first_name,Last_name'])
                 ->whereIn('class_course_id', $classIds)
                 ->get();
         }
@@ -43,7 +43,8 @@ class ClassScheduleController extends Controller
         }
 
         $schedule = ClassSchedule::with(['classCourse', 'instructor'])->findOrFail($id);
-        return response()->json($schedule);
+
+        return response()->json(['success' => true, 'schedule' => $schedule]);
     }
 
     public function store(Request $request) {

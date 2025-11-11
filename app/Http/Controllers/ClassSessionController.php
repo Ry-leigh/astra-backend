@@ -9,9 +9,11 @@ use Illuminate\Support\Facades\Auth;
 
 class ClassSessionController extends Controller
 {
-    public function index($classScheduleId) {
+    public function index($classCourseId) {
         $user = Auth::user();
-        $schedule = ClassSchedule::with('classCourse.instructor.user')->findOrFail($classScheduleId);
+        $schedule = ClassSchedule::with('classCourse.instructor.user')->where('class_course_id', $classCourseId) ->get();
+
+        return response()->json(['message' => $schedule]);
 
         if ($user->hasRole('Administrator')) {
 
@@ -45,7 +47,7 @@ class ClassSessionController extends Controller
         $user = Auth::user();
         $schedule = ClassSchedule::findOrFail($classScheduleId);
 
-        if (! $user->hasAnyRole(['Administrator', 'Instructor', 'Officer'])) {
+        if (! ($user->hasRole('Administrator') || $user->hasRole('Instructor') || $user->hasRole('Officer'))) {
             return response()->json(['message' => 'Forbidden.'], 403);
         }
 
@@ -63,7 +65,7 @@ class ClassSessionController extends Controller
         if (ClassSession::where('class_schedule_id', $schedule->id)
             ->whereDate('session_date', $validated['session_date'])
             ->exists()) {
-            return response()->json(['message' => 'Session already exists.'], 409);
+            return response()->json(['message' => 'Session already exists']);
         }
 
         $session = ClassSession::create([
@@ -100,7 +102,7 @@ class ClassSessionController extends Controller
         $session = ClassSession::findOrFail($id);
         $schedule = $session->classSchedule;
 
-        if (! $user->hasAnyRole(['Administrator', 'Instructor', 'Officer'])) {
+        if (! ($user->hasRole('Administrator') || $user->hasRole('Instructor') || $user->hasRole('Officer'))) {
             return response()->json(['message' => 'Forbidden.'], 403);
         }
 

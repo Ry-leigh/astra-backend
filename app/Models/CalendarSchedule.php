@@ -12,11 +12,13 @@ class CalendarSchedule extends Model
     protected $fillable = [
         'title',
         'description',
-        'schedule_type',
-        'related_id',
-        'start_datetime',
-        'end_datetime',
-        'is_all_day',
+        'start_date',
+        'end_date',
+        'all_day',
+        'start_time',
+        'end_time',
+        'category',
+        'repeats',
         'created_by'];
 
     public function creator()

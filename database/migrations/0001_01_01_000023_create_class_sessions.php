@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('class_sessions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('class_schedule_id')->constrained('class_schedules')->cascadeOnDelete();
+            $table->foreignId('class_schedule_id')->nullable()->constrained('class_schedules')->nullOnDelete();
+            $table->foreignId('calendar_schedule_id')->nullable()->constrained('calendar_schedules')->cascadeOnDelete();
             $table->foreignId('substitute_id')->nullable()->constrained('users')->nullOnDelete(); // optional substitute instructor
             $table->date('session_date'); // actual date of the class
             $table->boolean('cancelled')->default(false);
@@ -23,7 +24,7 @@ return new class extends Migration
             $table->foreignId('marked_by')->nullable()->constrained('users')->nullOnDelete();
             $table->boolean('integrity_flag')->default(false);
             $table->timestamps();
-            $table->unique(['class_schedule_id', 'session_date']); // prevent duplicates
+            $table->unique(['class_schedule_id', 'calendar_schedule_id', 'session_date']); // prevent duplicates
         });
     }
 
