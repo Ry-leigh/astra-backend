@@ -172,7 +172,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
     |--------------------------------------------------------------------------
     | Every user can view, mark, and delete their own notifications.
     */
-    Route::apiResource('notifications', NotificationController::class);
+    // GET all notifications
+    Route::get('/notifications', [NotificationController::class, 'index']);
+
+    // GET only unread notifications
+    Route::get('/notifications/unread', [NotificationController::class, 'unread']);
+
+    // PATCH a single notification as read
+    Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+
+    // PATCH all notifications as read
+    Route::patch('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+
+    // DELETE a single notification
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
 
     /*
     |--------------------------------------------------------------------------
