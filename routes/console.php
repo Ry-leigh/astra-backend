@@ -9,3 +9,6 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('sessions:generate')->dailyAt('00:05');
+
+// On your production or dev server, add this to your crontab:
+// * * * * * cd /path/to/your/project && php artisan schedule:run >> /dev/null 2>&1

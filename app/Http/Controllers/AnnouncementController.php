@@ -7,9 +7,12 @@ use App\Models\ClassCourse;
 use App\Models\Classroom;
 use App\Models\Program;
 use App\Models\Role;
+use App\Models\User;
+use App\Notifications\NewAnnouncement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class AnnouncementController extends Controller
 {
@@ -22,7 +25,7 @@ class AnnouncementController extends Controller
     public function show($id) {
         $announcement = Announcement::with(['targets'])->findOrFail($id);
 
-        return response()->json($announcement);
+        return response()->json(['success' => true, 'announcements' => $announcement]);
     }
 
     public function create() {
@@ -99,10 +102,10 @@ class AnnouncementController extends Controller
         }
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $user = Auth::user();
 
-        // sample request structure
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -124,17 +127,12 @@ class AnnouncementController extends Controller
             'created_by' => $user->id,
         ]);
 
+        // Build targets for announcement_targets table
         $targets = [];
 
-        // Global
-        if (!empty($validated['targets']['global']) && $validated['targets']['global'] === true) {
-            $targets[] = [
-                'target_type' => 'global',
-                'target_id' => null,
-            ];
+        if (!empty($validated['targets']['global'])) {
+            $targets[] = ['target_type' => 'global', 'target_id' => null];
         } else {
-
-            // referenced from the announcement_targets table
             $mapping = [
                 'roles' => 'role',
                 'programs' => 'program',
@@ -156,8 +154,61 @@ class AnnouncementController extends Controller
 
         $announcement->targets()->createMany($targets);
 
-        return response()->json(['message' => 'Announcement created successfully!']);
+        // ----------------------
+        // Build target users collection
+        // ----------------------
+        if (!empty($validated['targets']['global'])) {
+            $targetUsers = User::all();
+        } else {
+            $targetUsers = collect(); // IMPORTANT: initialize an empty collection
+
+            // Roles
+            if (!empty($validated['targets']['roles'])) {
+                $roleUsers = User::whereHas('roles', function ($q) use ($validated) {
+                    $q->whereIn('roles.id', $validated['targets']['roles']);
+                })->get();
+                $targetUsers = $targetUsers->merge($roleUsers);
+            }
+
+            // Programs (students + instructors)
+            if (!empty($validated['targets']['programs'])) {
+                $programStudents = User::whereHas('student', function ($q) use ($validated) {
+                    $q->whereIn('program_id', $validated['targets']['programs']);
+                })->get();
+
+                $programInstructors = User::whereHas('instructor', function ($q) use ($validated) {
+                    $q->whereIn('program_id', $validated['targets']['programs']);
+                })->get();
+
+                $targetUsers = $targetUsers->merge($programStudents)->merge($programInstructors);
+            }
+
+            // Classrooms
+            if (!empty($validated['targets']['classrooms'])) {
+                $classUsers = User::whereHas('student.enrollments.classroom', function ($q) use ($validated) {
+                    $q->whereIn('id', $validated['targets']['classrooms']);
+                })->get();
+                $targetUsers = $targetUsers->merge($classUsers);
+            }
+
+            // Class courses
+            if (!empty($validated['targets']['class_courses'])) {
+                $classCourseUsers = User::whereHas('student.enrollments.classCourse', function ($q) use ($validated) {
+                    $q->whereIn('id', $validated['targets']['class_courses']);
+                })->get();
+                $targetUsers = $targetUsers->merge($classCourseUsers);
+            }
+        }
+
+        $targetUsers = $targetUsers->unique('id');
+
+        if ($targetUsers->isNotEmpty()) {
+            Notification::send($targetUsers, new NewAnnouncement($announcement));
+        }
+
+        return response()->json(['message' => 'Announcement created successfully!', 'users' => $targetUsers]);
     }
+
 
     public function update(Request $request, $id) {
         $user = Auth::user();

@@ -24,7 +24,7 @@ return new class extends Migration
             $table->foreignId('marked_by')->nullable()->constrained('users')->nullOnDelete();
             $table->boolean('integrity_flag')->default(false);
             $table->timestamps();
-            $table->unique(['class_schedule_id', 'calendar_schedule_id', 'session_date']); // prevent duplicates
+            $table->unique(['class_schedule_id', 'calendar_schedule_id', 'session_date'], 'class_sched_cal_sched_date_unique'); // prevent duplicates
         });
     }
 
