@@ -16,6 +16,7 @@ class ClassController extends Controller
         $query = ClassCourse::with([
             'course:id,name,code,description',
             'instructor.user:id,first_name,last_name,email',
+            'classroom.program:id,name',
         ]);
 
         switch (true) {

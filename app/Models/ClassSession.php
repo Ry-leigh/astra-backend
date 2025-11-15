@@ -8,6 +8,7 @@ class ClassSession extends Model
 {
     protected $fillable = [
         'class_schedule_id',
+        'calendar_schedule_id',
         'substitute_id',
         'session_date',
         'time_in',
@@ -19,6 +20,11 @@ class ClassSession extends Model
     public function classSchedule()
     {
         return $this->belongsTo(ClassSchedule::class);
+    }
+
+    public function calendarSchedule()
+    {
+        return $this->belongsTo(CalendarSchedule::class);
     }
 
     public function substitute()

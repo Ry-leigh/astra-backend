@@ -40,8 +40,13 @@ class ClassCourse extends Model
         return $this->hasMany(Task::class);
     }
 
-    public function schedules()
+    public function classSchedules()
     {
         return $this->hasMany(ClassSchedule::class);
+    }
+
+    public function calendarSchedules()
+    {
+        return $this->hasMany(CalendarSchedule::class);
     }
 }

@@ -10,12 +10,14 @@ class AttendanceRecord extends Model
     use HasFactory;
     
     protected $fillable = [
-        'student_id',
         'class_session_id',
+        'student_id',
         'status',
         'time_in',
         'remarks',
         'marked_by',
+        'integrity_flag',
+        'substitute_id',
     ];
 
     public function student()

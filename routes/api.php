@@ -132,21 +132,23 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/enrollments/{id}', [EnrollmentController::class, 'destroy'])->middleware('role:Administrator|Instructor');
 
         // Attendance page methods
-        Route::get('/{student}/attendance', [AttendanceController::class, 'studentIndex']); //not yet created        
+        Route::get('/{student}/attendance', [AttendanceController::class, 'studentIndex']); //not yet created
+                
         Route::prefix('attendance')->group(function () {
-            Route::get('/{sessionId?}', [AttendanceController::class, 'index']);
-            Route::post('/', [AttendanceController::class, 'store'])->middleware('role:admin|instructor');
-            Route::put('/{id}', [AttendanceController::class, 'update'])->middleware('role:admin|instructor');
-            Route::delete('/{id}', [AttendanceController::class, 'destroy'])->middleware('role:admin|instructor');
+            Route::get('/{date?}', [AttendanceController::class, 'index']);
+            Route::get('/{date}/previous', [AttendanceController::class, 'previous']);
+            Route::get('/{date}/next', [AttendanceController::class, 'next']);
+            Route::post('/', [AttendanceController::class, 'store'])->middleware('role:Administrator,Instructor');
+            Route::patch('/{attendanceId}', [AttendanceController::class, 'update'])->middleware('role:Administrator,Instructor,Officer');
         });
 
 
         // tasks page methods
         Route::prefix('tasks')->group(function () {
             Route::get('/', [TaskController::class, 'index']);
-            Route::post('/', [TaskController::class, 'store'])->middleware('role:Administrator|Instructor');
-            Route::put('/{id}', [TaskController::class, 'update'])->middleware('role:Administrator|Instructor');
-            Route::delete('/{id}', [TaskController::class, 'destroy'])->middleware('role:Administrator|Instructor');
+            Route::post('/', [TaskController::class, 'store'])->middleware('role:Administrator,Instructor');
+            Route::put('/{id}', [TaskController::class, 'update'])->middleware('role:Administrator,Instructor');
+            Route::delete('/{id}', [TaskController::class, 'destroy'])->middleware('role:Administrator,Instructor');
         });
 
         // Class-specific announcements methods

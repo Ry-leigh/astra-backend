@@ -18,6 +18,8 @@ class CalendarSchedule extends Model
         'start_time',
         'end_time',
         'category',
+        'class_course_id',
+        'room',
         'repeats',
         'created_by'];
 
@@ -29,5 +31,15 @@ class CalendarSchedule extends Model
     public function targets()
     {
         return $this->hasMany(CalendarScheduleTarget::class);
+    }
+
+    public function classCourse()
+    {
+        return $this->belongsTo(ClassCourse::class);
+    }
+
+    public function classSessions()
+    {
+        return $this->hasMany(ClassSession::class);
     }
 }

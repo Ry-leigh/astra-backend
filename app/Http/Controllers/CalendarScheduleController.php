@@ -7,6 +7,7 @@ use App\Models\ClassCourse;
 use App\Models\Classroom;
 use App\Models\Program;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -134,6 +135,8 @@ class CalendarScheduleController extends Controller
             'start_time' => 'nullable|date_format:H:i:s',
             'end_time' => 'nullable|date_format:H:i:s',
             'category' => 'required|in:holiday,event,meeting,exam,makeup_class',
+            'class_course_id' => 'nullable|exists:class_courses,id',
+            'room' => 'nullable',
             'repeats' => 'nullable|in:none,daily,weekly,monthly,yearly',
             'targets' => 'required|array',
             'targets.global' => 'boolean',
@@ -152,6 +155,8 @@ class CalendarScheduleController extends Controller
             'start_time' => $validated['start_time'] ?? null,
             'end_time' => $validated['end_time'] ?? null,
             'category' => $validated['category'],
+            'class_course_id' => $validated['class_course_id'] ?? null,
+            'room' => $validated['room'] ?? null,
             'repeats' => $validated['repeats'] ?? 'none',
             'created_by' => $user->id,
         ]);
