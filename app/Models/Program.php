@@ -11,7 +11,9 @@ class Program extends Model
     
     protected $fillable = [
         'name',
-        'description'];
+        'description',
+        'color'
+    ];
 
     public function classrooms()
     {

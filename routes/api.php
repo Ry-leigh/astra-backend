@@ -125,11 +125,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     */
     Route::get('/class', [ClassController::class, 'index']); // lists classes taught if instructor, list classes enrolled if student
 
+    Route::delete('/enrollments/{id}', [EnrollmentController::class, 'destroy'])->middleware('role:Administrator,Instructor');
+
     Route::prefix('class/{classCourseId}')->group(function () {
         // Index page methods
         Route::get('/', [ClassController::class, 'show']);
-        Route::post('/{id}/enroll', [EnrollmentController::class, 'store'])->middleware('role:Administrator|Instructor');
-        Route::delete('/enrollments/{id}', [EnrollmentController::class, 'destroy'])->middleware('role:Administrator|Instructor');
+        Route::post('/{id}/enroll', [EnrollmentController::class, 'store'])->middleware('role:Administrator,Instructor');
 
         // Attendance page methods
         Route::get('/{student}/attendance', [AttendanceController::class, 'studentIndex']); //not yet created

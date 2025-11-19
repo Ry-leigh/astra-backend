@@ -16,11 +16,11 @@ class ClassroomController extends Controller
     {
         $program = Program::findOrFail($programId);
 
-        $classrooms = Classroom::with('program:id,name')
+        $classrooms = Classroom::with('program:id,name', 'academicYear:id,year_start,year_end')
             ->where('program_id', $program->id)
             ->orderBy('year_level')
             ->orderBy('section')
-            ->get(['id', 'program_id', 'year_level', 'section', 'academic_year']);
+            ->get();
 
         return response()->json([
             'success' => true,

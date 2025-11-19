@@ -13,7 +13,8 @@ class Classroom extends Model
         'program_id',
         'year_level',
         'section',
-        'academic_year'];
+        'academic_year_id'
+    ];
 
     public function program()
     {
@@ -23,5 +24,10 @@ class Classroom extends Model
     public function classCourses()
     {
         return $this->hasMany(ClassCourse::class);
+    }
+
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYear::class);
     }
 }

@@ -20,17 +20,21 @@ class ProgramController extends Controller
         return response()->json(['success' => true, 'data' => $program]);
     }
 
-    public function store(Request $request) {   
+    public function store(Request $request) {
+        $color = ltrim($request->input('color'), '#');
+        $request['color'] = $color;
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|unique:programs,name',
             'description' => 'nullable|string',
+            'color' => 'nullable|regex:/^[a-f0-9]{6}$/i'
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            return response()->json(['success' => false, 'errors' => $validator->errors()]);
         }
 
-        $program = Program::create($request->only(['name', 'description']));
+        $program = Program::create($request->only(['name', 'description', 'color']));
 
         return response()->json(['success' => true, 'data' => $program], 201);
     }
@@ -43,19 +47,24 @@ class ProgramController extends Controller
             return response()->json(['message' => 'Program not found.'], 404);
         }
 
+        $color = ltrim($request->input('color'), '#');
+        $request['color'] = $color;
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|unique:programs,name,' . $program->id,
             'description' => 'nullable|string',
+            'color' => 'nullable|regex:/^[a-f0-9]{6}$/i'
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            return response()->json(['success' => false, 'errors' => $validator->errors()]);
         }
 
-        $program->update($request->only(['name', 'description']));
+        $program->update($request->only(['name', 'description', 'color']));
 
         return response()->json(['success' => true, 'data' => $program]);
     }
+
 
     public function destroy($id) {
         $program = Program::find($id);

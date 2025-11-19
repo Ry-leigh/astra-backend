@@ -44,15 +44,15 @@ class EnrollmentController extends Controller
     }
 
     public function destroy($id)
-        {
-            $enrollment = Enrollment::find($id);
+    {
+        $enrollment = Enrollment::find($id);
 
-            if (!$enrollment) {
-                return response()->json(['message' => 'Enrollment not found.'], 404);
-            }
-
-            $enrollment->delete();
-
-            return response()->json(['message' => 'Student unenrolled successfully.']);
+        if (!$enrollment) {
+            return response()->json(['message' => 'Enrollment not found.'], 404);
         }
+
+        $enrollment->delete();
+
+        return response()->json(['success' => true, 'message' => 'Student unenrolled successfully.']);
+    }
 }
