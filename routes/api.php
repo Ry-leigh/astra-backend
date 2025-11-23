@@ -56,6 +56,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     | update, or delete them depending on ownership and role.
     */
     Route::apiResource('announcements', AnnouncementController::class);
+    Route::get('/announcement/create', [AnnouncementController::class, 'create'])->middleware('role:Administrator,Instructor');
+    
 
     /*
     |--------------------------------------------------------------------------
@@ -64,7 +66,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     | Unified calendar for holidays, events, meetings, exams, and make-up classes.
     */
     Route::apiResource('calendar', CalendarScheduleController::class);
-    Route::get('/calendar/create', [CalendarScheduleController::class, 'create']);
+    Route::get('/calendar/create', [CalendarScheduleController::class, 'create'])->middleware('role:Administrator');
 
     /*
     |--------------------------------------------------------------------------
@@ -168,6 +170,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     | Centralized user management for system administrators.
     */
     Route::apiResource('users', UserController::class)->middleware('role:Administrator');
+    Route::get('/user/create', [UserController::class, 'create'])->middleware('role:Administrator');
+    // Route::get('/user/{id}', [UserController::class, 'edit'])->middleware('role:Administrator');
 
     /*
     |--------------------------------------------------------------------------

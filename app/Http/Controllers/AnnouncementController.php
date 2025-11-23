@@ -17,9 +17,19 @@ use Illuminate\Support\Facades\Notification;
 class AnnouncementController extends Controller
 {
     public function index() {
-        $announcements = Announcement::with('targets')->visibleTo(Auth::user())->latest()->get();
+        $user = Auth::user();
+        if ($user->hasRole('Administrator')) {
+            $announcements = Announcement::with('targets' )->get();
+        } else {
+            $announcements = Announcement::with('targets')->visibleTo(Auth::user())->latest()->get();
+        };
 
-        return response()->json(['success' => true, 'announcements' => $announcements]);
+        $roles = Role::select('id', 'name')->get();
+        $programs = Program::select('id', 'name')->get();
+        $classrooms = Classroom::join('programs', 'classrooms.program_id', '=', 'programs.id')
+            ->select('classrooms.id', DB::raw("CONCAT(programs.name, ' ', classrooms.year_level, classrooms.section) as name"))
+            ->get();
+        return response()->json(['success' => true, 'announcements' => $announcements, 'target_catalog' => [ 'role' => $roles, 'program' => $programs, 'classroom' => $classrooms ]]);
     }
 
     public function show($id) {
@@ -34,7 +44,7 @@ class AnnouncementController extends Controller
         $roleNames = $user->roles->pluck('name')->toArray();
         $roleIds = $user->roles->pluck('id')->toArray();
 
-        if (in_array('Administrator', $roleNames)) {
+        if ($user->hasRole('Administrator')) {
 
             $roles = Role::select('id', 'name')->get();
 
@@ -63,6 +73,7 @@ class AnnouncementController extends Controller
                 ]);
                 
             return response()->json([
+                'success' => true,
                 'roles' => $roles,
                 'programs' => $programs,
                 'classrooms' => $classrooms,
@@ -95,6 +106,7 @@ class AnnouncementController extends Controller
             ]);
 
             return response()->json([
+                'success' => true,
                 'classrooms' => $classrooms,
                 'class_courses' => $classCourses,
             ]);
@@ -154,15 +166,11 @@ class AnnouncementController extends Controller
 
         $announcement->targets()->createMany($targets);
 
-        // ----------------------
-        // Build target users collection
-        // ----------------------
         if (!empty($validated['targets']['global'])) {
             $targetUsers = User::all();
         } else {
-            $targetUsers = collect(); // IMPORTANT: initialize an empty collection
+            $targetUsers = collect();
 
-            // Roles
             if (!empty($validated['targets']['roles'])) {
                 $roleUsers = User::whereHas('roles', function ($q) use ($validated) {
                     $q->whereIn('roles.id', $validated['targets']['roles']);
@@ -170,28 +178,23 @@ class AnnouncementController extends Controller
                 $targetUsers = $targetUsers->merge($roleUsers);
             }
 
-            // Programs (students + instructors)
             if (!empty($validated['targets']['programs'])) {
                 $programStudents = User::whereHas('student', function ($q) use ($validated) {
                     $q->whereIn('program_id', $validated['targets']['programs']);
                 })->get();
-
                 $programInstructors = User::whereHas('instructor', function ($q) use ($validated) {
                     $q->whereIn('program_id', $validated['targets']['programs']);
                 })->get();
-
                 $targetUsers = $targetUsers->merge($programStudents)->merge($programInstructors);
             }
 
-            // Classrooms
             if (!empty($validated['targets']['classrooms'])) {
-                $classUsers = User::whereHas('student.enrollments.classroom', function ($q) use ($validated) {
+                $classUsers = User::whereHas('student.classroom', function ($q) use ($validated) {
                     $q->whereIn('id', $validated['targets']['classrooms']);
                 })->get();
                 $targetUsers = $targetUsers->merge($classUsers);
             }
 
-            // Class courses
             if (!empty($validated['targets']['class_courses'])) {
                 $classCourseUsers = User::whereHas('student.enrollments.classCourse', function ($q) use ($validated) {
                     $q->whereIn('id', $validated['targets']['class_courses']);
@@ -206,7 +209,7 @@ class AnnouncementController extends Controller
             Notification::send($targetUsers, new NewAnnouncement($announcement));
         }
 
-        return response()->json(['message' => 'Announcement created successfully!', 'users' => $targetUsers]);
+        return response()->json(['success' => true, 'message' => 'Announcement created successfully!', 'users' => $targetUsers]);
     }
 
 
@@ -270,14 +273,14 @@ class AnnouncementController extends Controller
         $announcement->targets()->delete();
         $announcement->targets()->createMany($targets);
 
-        return response()->json(['message' => 'Announcement updated successfully!']);
+        return response()->json(['success' => true, 'message' => 'Announcement updated successfully!']);
     }
 
     public function destroy($id) {
         $announcement = Announcement::findOrFail($id);
         $announcement->delete();
 
-        return response()->json(['message' => 'Announcement deleted successfully']);
+        return response()->json(['success' => true, 'message' => 'Announcement deleted successfully']);
     }
 
     // ---------- class-specific announcements CRUD methods ----------

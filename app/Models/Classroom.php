@@ -16,6 +16,11 @@ class Classroom extends Model
         'academic_year_id'
     ];
 
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
+
     public function program()
     {
         return $this->belongsTo(Program::class);

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Classroom;
 use App\Models\Instructor;
+use App\Models\Program;
 use App\Models\Role;
 use App\Models\Student;
 use App\Models\User;
@@ -17,6 +19,15 @@ class UserController extends Controller
         return response()->json(['success' => true, 'users' => $users]);
     }
 
+    public function create() {
+        return response()->json([
+            'success' => true,
+            'roles' => Role::get(),
+            'programs' => Program::get(),
+            'classrooms' => Classroom::get()
+        ]);
+    }
+
     public function store(Request $request) {
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
@@ -25,8 +36,9 @@ class UserController extends Controller
             'sex' => 'nullable|in:M,F',
             'address' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:6|confirmed',
+            'password' => 'required|min:8|confirmed',
             'role_id' => 'required|exists:roles,id',
+            'section' => 'nullable',
             'program_id' => 'nullable|exists:programs,id',
             'year_level' => 'nullable|integer|min:1|max:5',
         ]);
@@ -38,25 +50,37 @@ class UserController extends Controller
         $user->roles()->attach($validated['role_id']);
 
         $role = Role::find($validated['role_id'])->name;
-        if ($role === 'instructor') {
+        if ($role === 'Instructor') {
             Instructor::create([
                 'user_id' => $user->id,
                 'program_id' => $validated['program_id'] ?? null,
             ]);
-        } elseif ($role === 'student') {
+        } elseif ($role === 'Student' || $role === 'Officer') {
+            $section = $validated['section'];
+            $classroom = Classroom::where('program_id', $validated['program_id'])
+                        ->where('year_level', $validated['year_level'])
+                        ->when($section !== null, function($query) use ($section) {
+                            return $query->where('section', $section);
+                        })
+                        ->when($section === null, function($query) {
+                            return $query->whereNull('section');
+                        })
+                        ->orderBy('section', 'asc')
+                        ->first();
             Student::create([
                 'user_id' => $user->id,
                 'program_id' => $validated['program_id'] ?? null,
                 'year_level' => $validated['year_level'] ?? 1,
+                'classroom_id' => $classroom?->id
             ]);
         }
 
-        return response()->json(['message' => 'User created successfully', 'user' => $user], 201);
+        return response()->json(['success' => true, 'message' => 'User created successfully', 'user' => $user]);
     }
 
     public function show($id) {
         $user = User::with(['roles', 'instructor.program', 'student.program'])->findOrFail($id);
-        return response()->json($user);
+        return response()->json(['success' => true, 'user' => $user]);
     }
 
     public function update(Request $request, $id) {
@@ -71,6 +95,7 @@ class UserController extends Controller
             'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],
             'password' => 'nullable|min:6|confirmed',
             'role_id' => 'required|exists:roles,id',
+            'section' => 'nullable',
             'program_id' => 'nullable|exists:programs,id',
             'year_level' => 'nullable|integer|min:1|max:5',
         ]);
@@ -86,19 +111,32 @@ class UserController extends Controller
         $user->roles()->sync([$validated['role_id']]);
         $role = Role::find($validated['role_id'])->name;
 
-        if ($role === 'instructor') {
+        if ($role === 'Instructor') {
             $user->student()?->delete();
             $user->instructor()->updateOrCreate(
                 ['user_id' => $user->id],
                 ['program_id' => $validated['program_id'] ?? null]
             );
-        } elseif ($role === 'student') {
+        } elseif ($role === 'Student' || $role === 'Officer') {
+            $section = $validated['section'];
+            $classroom = Classroom::where('program_id', $validated['program_id'])
+                        ->where('year_level', $validated['year_level'])
+                        ->when($section !== null, function($query) use ($section) {
+                            return $query->where('section', $section);
+                        })
+                        ->when($section === null, function($query) {
+                            return $query->whereNull('section');
+                        })
+                        ->orderBy('section', 'asc')
+                        ->first();
+            
             $user->instructor()?->delete();
             $user->student()->updateOrCreate(
                 ['user_id' => $user->id],
                 [
                     'program_id' => $validated['program_id'] ?? null,
-                    'year_level' => $validated['year_level'] ?? 1
+                    'year_level' => $validated['year_level'] ?? 1,
+                    'classroom_id' => $classroom?->id
                 ]
             );
         } else {
@@ -106,7 +144,7 @@ class UserController extends Controller
             $user->student()?->delete();
         }
 
-        return response()->json(['message' => 'User updated successfully']);
+        return response()->json(['success' => true, 'message' => 'User updated successfully']);
     }
 
     public function destroy($id) {

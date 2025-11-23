@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('program_id')->nullable()->constrained('programs')->nullOnDelete();
             $table->integer('year_level');
+            $table->foreignId('classroom_id')->nullable()->constrained('classrooms')->nullOnDelete();
             $table->timestamps();
         });
     }
