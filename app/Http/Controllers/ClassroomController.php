@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AcademicYear;
 use App\Models\ClassCourse;
 use App\Models\Classroom;
 use App\Models\Program;
@@ -22,10 +23,13 @@ class ClassroomController extends Controller
             ->orderBy('section')
             ->get();
 
+        $academicYear = AcademicYear::select('id', 'year_start', 'year_end')->get();
+
         return response()->json([
             'success' => true,
             'program' => $program,
-            'data' => $classrooms,
+            'classrooms' => $classrooms,
+            'academic_years' =>$academicYear
         ]);
     }
 
@@ -60,12 +64,19 @@ class ClassroomController extends Controller
     public function store(Request $request) {
         $validated = $request->validate([
             'program_id'    => 'required|exists:programs,id',
-            'year_level'    => 'integer|string',
+            'year_level'    => 'required|integer',
             'section'       => 'nullable|string',
-            'academic_year' => 'required|string',
+            'academic_year_id' => 'required|exists:academic_years,id',
         ]);
 
-        $classroom = Classroom::create($validated);
+        $validated['section'] = $validated['section'] ?: null; // normalize empty string to null
+
+        $classroom = Classroom::firstOrCreate([
+            'program_id' => $validated['program_id'],
+            'year_level' => $validated['year_level'],
+            'section' => $validated['section'],
+            'academic_year_id' => $validated['academic_year_id'],
+        ]);
 
         return response()->json([
             'success' => true,
@@ -76,9 +87,9 @@ class ClassroomController extends Controller
     public function update(Request $request, $id) {
         $validated = $request->validate([
             'program_id'    => 'required|exists:programs,id',
-            'year_level'    => 'required|string',
+            'year_level'    => 'required|integer',
             'section'       => 'nullable|string',
-            'academic_year' => 'required|string',
+            'academic_year_id' => 'required|exists:academic_years,id',
         ]);
 
         $classroom = Classroom::findOrFail($id);
@@ -91,8 +102,8 @@ class ClassroomController extends Controller
         ]);
     }
 
-    public function destroy(Classroom $classroom) {
-        $classroom->delete();
+    public function destroy(Classroom $id) {
+        $id->delete();
 
         return response()->json(['success' => true, 'message' => 'Classroom deleted successfully']);
     }

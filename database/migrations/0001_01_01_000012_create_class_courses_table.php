@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('classroom_id')->constrained('classrooms')->cascadeOnDelete();
             $table->foreignId('course_id')->constrained('courses')->cascadeOnDelete();
             $table->foreignId('instructor_id')->nullable()->constrained('instructors')->nullOnDelete();
-            $table->integer('semester');
+            $table->integer('semester_id')->nullable()->constrained('semesters')->nullOnDelete();
             $table->string('color')->nullable();
             $table->timestamps();
         });

@@ -90,6 +90,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     */
     Route::apiResource('programs', ProgramController::class)->middleware('role:Administrator');
 
+
+
     /*
     |--------------------------------------------------------------------------
     | Classrooms
@@ -112,6 +114,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     */
     Route::prefix('courses')->group(function () {
         Route::get('/{classroomId}', [CourseController::class, 'index'])->middleware('role:Administrator');
+        Route::get('/add/{classroomId}', [ClassController::class, 'create']);
+        Route::post('/{classroomId}', [ClassController::class, 'store'])->middleware('role:Administrator');
         Route::post('/', [CourseController::class, 'store'])->middleware('role:Administrator');
         Route::put('/{id}', [CourseController::class, 'update'])->middleware('role:Administrator');
         Route::delete('/{id}', [CourseController::class, 'destroy'])->middleware('role:Administrator');

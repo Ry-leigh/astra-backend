@@ -34,7 +34,7 @@ class CourseController extends Controller
                 'id' => $classroom->id,
                 'name' => $classroomName,
                 'program' => $programName,
-                'academic_year' => $classroom->academic_year
+                'academic_year_id' => $classroom->academic_year_id
             ],
             'courses' => $courses
         ]);
