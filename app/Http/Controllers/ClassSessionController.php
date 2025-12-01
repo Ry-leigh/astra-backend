@@ -97,9 +97,9 @@ class ClassSessionController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id) {
+    public function update(Request $request, $classCourseId, $sessionId) {
         $user = Auth::user();
-        $session = ClassSession::findOrFail($id);
+        $session = ClassSession::findOrFail($sessionId);
         $schedule = $session->classSchedule;
 
         if (! ($user->hasRole('Administrator') || $user->hasRole('Instructor') || $user->hasRole('Officer'))) {
@@ -108,8 +108,8 @@ class ClassSessionController extends Controller
 
         $validated = $request->validate([
             'session_date' => 'sometimes|date',
-            'time_in' => 'nullable|date_format:H:i',
-            'time_out' => 'nullable|date_format:H:i|after_or_equal:time_in',
+            'time_in' => 'nullable',
+            'time_out' => 'nullable',
             'remarks' => 'nullable|string',
         ]);
 

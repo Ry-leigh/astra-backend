@@ -45,6 +45,10 @@ class TaskController extends Controller
                 ->orderBy('due_date', 'asc')
                 ->get();
 
+            $withoutDueDate = Task::where('class_course_id', $classCourseId)
+                ->whereNull('due_date')
+                ->get();
+
             return response()->json([
                 'success' => true,
                 'class' => $classCourse,
@@ -52,6 +56,7 @@ class TaskController extends Controller
                     'today' => $todayTasks,
                     'upcoming' => $upcoming,
                     'finished' => $past,
+                    'undated' => $withoutDueDate
                 ]
             ]);
         } else {
@@ -81,7 +86,7 @@ class TaskController extends Controller
         }])->where('class_course_id', $classCourseId)->get();
 
         $finished = $tasks->filter(function ($t) use ($student) {
-            return $t->statuses->first()?->is_finished === true;
+            return $t->statuses->first()?->is_finished;
         })->values();
 
         $overdue = $tasks->filter(function ($t) use ($today) {
@@ -97,7 +102,8 @@ class TaskController extends Controller
         })->values();
 
         $upcoming = $tasks->filter(function ($t) use ($today) {
-            return $t->due_date && Carbon::parse($t->due_date)->gt($today);
+            return $t->due_date === null 
+                || Carbon::parse($t->due_date)->gt($today);
         })->reject(function ($t) use ($student) {
             return $t->statuses->first()?->is_finished;
         })->values();
@@ -114,9 +120,14 @@ class TaskController extends Controller
         ]);
     }
 
-    public function store(Request $request, $classId) {
+    public function show($classCourseId, $id) {
+        $task = Task::findOrFail($id);
+        return response()->json(['success' => true, 'task' => $task]);
+    }
+
+    public function store(Request $request, $classCourseId) {
         $user = Auth::user();
-        $classCourse = ClassCourse::findOrFail($classId);
+        $classCourse = ClassCourse::findOrFail($classCourseId);
 
         $isInstructor = $user->roles->contains('name', 'Instructor');
         if ($isInstructor) {
@@ -135,7 +146,7 @@ class TaskController extends Controller
         ]);
 
         $task = Task::create([
-            'class_course_id' => $classId,
+            'class_course_id' => $classCourseId,
             'title' => $validated['title'],
             'description' => $validated['description'],
             'due_date' => $validated['due_date'] ?? null,

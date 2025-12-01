@@ -90,7 +90,7 @@ class ClassController extends Controller
 
     public function create($classroomId) {
         $currentCourses = ClassCourse::where('classroom_id', $classroomId)->pluck('course_id');
-        $courses = Course::whereNotIn('id', $currentCourses)->get();
+        $courses = Course::get();
         $instructors = Instructor::select('id', 'user_id')
             ->with(['user:id,sex,first_name,last_name'])
             ->get();
@@ -130,10 +130,68 @@ class ClassController extends Controller
             'classroom_id'  => $classroomId,
             'course_id'     => $validated['course_id'],
             'instructor_id' => $validated['instructor_id'] ?? null,
-            'semester_id'      => $semesterId,
+            'semester_id'   => $semesterId,
             'color'         => $validated['color'],
         ]);
 
         return response()->json(['success' => true, 'message' => 'Course added successfully.', 'data' => $course], 201);
+    }
+
+    public function update($classroomId, Request $request, $id)
+    {
+        $classCourse = ClassCourse::find($id);
+
+        if (!$classCourse) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Class not found.'
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'course_id'         => 'required|exists:courses,id',
+            'instructor_id'     => 'nullable|exists:instructors,id',
+            'academic_year_id'  => 'required|exists:academic_years,id',
+            'semester'          => 'required|integer',
+            'color'             => 'nullable',
+        ]); 
+
+        // Find the semester record
+        $semesterRecord = Semester::where('academic_year_id', $validated['academic_year_id'])
+            ->where('semester', $validated['semester'])
+            ->first();
+
+        if (! $semesterRecord) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Semester not found.',
+            ], 404);
+        }
+
+        $classCourse->update([
+            'classroom_id'  => $classroomId,
+            'course_id'     => $validated['course_id'],
+            'instructor_id' => $validated['instructor_id'] ?? null,
+            'semester_id'   => $semesterRecord->id,
+            'color'         => $validated['color'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Class updated successfully.',
+            'data'    => $classCourse
+        ], 200);
+    }
+
+    public function destroy($classroomId, $id) {
+        $classCourse = ClassCourse::find($id);
+
+        if (!$classCourse) {
+            return response()->json(['success' => false, 'message' => 'Class not found.'], 404);
+        }
+
+        $classCourse->delete();
+
+        return response()->json(['success' => true, 'message' => 'Class deleted successfully.']);
     }
 }

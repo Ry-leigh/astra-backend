@@ -18,9 +18,11 @@ use App\Http\Controllers\{
     AuthController,
     TaskController,
     ClassAnnouncementController,
+    ClassSessionController,
     UserController,
     NotificationController,
     SettingsController,
+    TaskStatusController,
 };
 
 /*
@@ -116,6 +118,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/{classroomId}', [CourseController::class, 'index'])->middleware('role:Administrator');
         Route::get('/add/{classroomId}', [ClassController::class, 'create']);
         Route::post('/{classroomId}', [ClassController::class, 'store'])->middleware('role:Administrator');
+        Route::put('/{classroomId}/{id}', [ClassController::class, 'update'])->middleware('role:Administrator');
+        Route::delete('/{classroomId}/{id}', [ClassController::class, 'destroy'])->middleware('role:Administrator');
         Route::post('/', [CourseController::class, 'store'])->middleware('role:Administrator');
         Route::put('/{id}', [CourseController::class, 'update'])->middleware('role:Administrator');
         Route::delete('/{id}', [CourseController::class, 'destroy'])->middleware('role:Administrator');
@@ -136,12 +140,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('class/{classCourseId}')->group(function () {
         // Index page methods
         Route::get('/', [ClassController::class, 'show']);
-        Route::post('/{id}/enroll', [EnrollmentController::class, 'store'])->middleware('role:Administrator,Instructor');
+        Route::get('/students', [EnrollmentController::class, 'students']);
+        Route::post('/enroll', [EnrollmentController::class, 'store'])->middleware('role:Administrator,Instructor');
 
         // Attendance page methods
         Route::get('/{student}/attendance', [AttendanceController::class, 'studentIndex']); //not yet created
                 
         Route::prefix('attendance')->group(function () {
+            Route::put('/{sessionId}', [ClassSessionController::class, 'update']);
             Route::get('/{date?}', [AttendanceController::class, 'index']);
             Route::get('/{date}/previous', [AttendanceController::class, 'previous']);
             Route::get('/{date}/next', [AttendanceController::class, 'next']);
@@ -153,9 +159,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // tasks page methods
         Route::prefix('tasks')->group(function () {
             Route::get('/', [TaskController::class, 'index']);
+            Route::get('/{id}', [TaskController::class, 'show']);
             Route::post('/', [TaskController::class, 'store'])->middleware('role:Administrator,Instructor');
             Route::put('/{id}', [TaskController::class, 'update'])->middleware('role:Administrator,Instructor');
             Route::delete('/{id}', [TaskController::class, 'destroy'])->middleware('role:Administrator,Instructor');
+            Route::post('/status/{id}', [TaskStatusController::class, 'markFinished']);
+            Route::delete('/status/{id}', [TaskStatusController::class, 'markUnfinished']);
         });
 
         // Class-specific announcements methods

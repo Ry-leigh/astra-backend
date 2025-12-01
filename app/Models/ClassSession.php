@@ -15,6 +15,7 @@ class ClassSession extends Model
         'time_out',
         'remarks',
         'marked_by',
+        'integrity_flag'
     ];
 
     public function classSchedule()

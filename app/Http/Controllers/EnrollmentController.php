@@ -4,13 +4,28 @@ namespace App\Http\Controllers;
 
 use App\Models\ClassCourse;
 use App\Models\Enrollment;
+use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class EnrollmentController extends Controller
 {
-    public function store(Request $request, $id)
+    public function students($classCourseId)
+    {
+        $classCourse = ClassCourse::findOrFail($classCourseId);
+
+        $students = Student::with('user')->whereDoesntHave('enrollments', function ($q) use ($classCourseId) {
+            $q->where('class_course_id', $classCourseId);
+        })->get();
+
+        return response()->json([
+            'success' => true,
+            'students' => $students
+        ]);
+    }
+
+    public function store(Request $request, $classCourseId)
     {
         $user = Auth::user();
 
@@ -18,7 +33,7 @@ class EnrollmentController extends Controller
             'student_id' => 'required|exists:students,id',
         ]);
 
-        $classCourse = ClassCourse::findOrFail($id);
+        $classCourse = ClassCourse::findOrFail($classCourseId);
 
         if ($user->hasRole('Instructor')) {
             if ($classCourse->instructor_id !== $user->instructor->id) {
@@ -27,7 +42,7 @@ class EnrollmentController extends Controller
         }
 
         $exists = Enrollment::where([
-            'class_course_id' => $id,
+            'class_course_id' => $classCourseId,
             'student_id' => $validated['student_id'],
         ])->exists();
 
@@ -36,11 +51,11 @@ class EnrollmentController extends Controller
         }
 
         $enrollment = Enrollment::create([
-            'class_course_id' => $id,
+            'class_course_id' => $classCourseId,
             'student_id' => $validated['student_id'],
         ]);
 
-        return response()->json(['message' => 'Student enrolled successfully.', 'data' => $enrollment], 201);
+        return response()->json(['success' => true, 'message' => 'Student enrolled successfully.', 'data' => $enrollment], 201);
     }
 
     public function destroy($id)

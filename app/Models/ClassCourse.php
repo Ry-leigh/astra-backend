@@ -13,7 +13,8 @@ class ClassCourse extends Model
         'classroom_id',
         'course_id',
         'instructor_id',
-        'semester'];
+        'semester_id',
+        'color'];
 
     public function classroom()
     {
