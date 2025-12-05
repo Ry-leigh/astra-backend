@@ -12,27 +12,23 @@ class ClassScheduleController extends Controller
         $user = Auth::user();
 
         if ($user->hasRole('Administrator')) {
-            $schedules = ClassSchedule::with(['classCourse', 'instructor'])->get();
-        }
-
-        elseif ($user->hasRole('Instructor') && $user->instructor) {
-            $schedules = ClassSchedule::with(['classCourse', 'instructor'])
-                ->where('instructor_id', $user->instructor->id)
+            $schedules = ClassSchedule::with(['classCourse', 'classCourse.course:id,name,description,code,units', 'classCourse.instructor.user:id,sex,first_name,Last_name'])->get();
+        } elseif ($user->hasRole('Instructor')) {
+            $schedules = ClassSchedule::with(['classCourse', 'classCourse.course:id,name,description,code,units', 'classCourse.instructor.user:id,sex,first_name,Last_name'])
+                ->whereHas('classCourse', function ($query) use ($user) {
+                    $query->where('instructor_id', $user->instructor->id);
+                })
                 ->get();
-        }
-        elseif (($user->hasRole('Officer') || $user->hasRole('Student')) && $user->student) {
-
+        } elseif (($user->hasRole('Officer') || $user->hasRole('Student')) && $user->student) {
             $classIds = $user->student->enrollments->pluck('class_course_id');
             $schedules = ClassSchedule::with(['classCourse', 'classCourse.course:id,name,description,code,units', 'classCourse.instructor.user:id,sex,first_name,Last_name'])
                 ->whereIn('class_course_id', $classIds)
                 ->get();
+        } else {
+            return response()->json(['success' => false, 'schedule' => 'No schedules found.']);
         }
 
-        else {
-            return response()->json(['message' => 'No schedules found.']);
-        }
-
-        return response()->json($schedules);
+        return response()->json(['success' => true, 'schedule' => $schedules]);
     }
 
     public function show($id) {
