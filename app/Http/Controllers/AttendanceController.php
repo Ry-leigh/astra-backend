@@ -21,6 +21,13 @@ class AttendanceController extends Controller
 
         $classCourse = ClassCourse::with(['classSchedules', 'calendarSchedules'])->findOrFail($classCourseId);
 
+        if ($classCourse->classSchedules->isEmpty() && $classCourse->calendarSchedules->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Schedule not found.',
+            ], 404);
+        }
+
         if ($this->isClassDay($requested, $classCourse->classSchedules, $classCourse->calendarSchedules)) {
             $finalDate = $requested;
         } else {
@@ -48,7 +55,7 @@ class AttendanceController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'No previous class session found.'
-            ], 404);
+            ], 500);
         }
 
         return $this->index($request, $classCourseId, $prev->toDateString());
