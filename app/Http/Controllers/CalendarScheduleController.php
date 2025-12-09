@@ -270,6 +270,6 @@ class CalendarScheduleController extends Controller
         $schedule = CalendarSchedule::findOrFail($id);
         $schedule->delete();
 
-        return response()->json(['message' => 'Schedule deleted successfully.']);
+        return response()->json(['success' => true, 'message' => 'Schedule deleted successfully.']);
     }
 }

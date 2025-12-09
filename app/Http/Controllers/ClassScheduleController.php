@@ -101,6 +101,6 @@ class ClassScheduleController extends Controller
         $schedule = ClassSchedule::findOrFail($id);
         $schedule->delete();
 
-        return response()->json(['message' => 'Class schedule deleted successfully']);
+        return response()->json(['success' => true, 'message' => 'Class schedule deleted successfully']);
     }
 }
