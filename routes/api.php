@@ -49,6 +49,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     | The landing page after login for all users (Admin, Instructor, Student).
     */
     Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::get('/dashboard/attendance/{year?}', [DashboardController::class, 'attendanceCount']);
 
     /*
     |--------------------------------------------------------------------------
@@ -67,8 +68,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     |--------------------------------------------------------------------------
     | Unified calendar for holidays, events, meetings, exams, and make-up classes.
     */
-    Route::apiResource('calendar', CalendarScheduleController::class);
     Route::get('/calendar/create', [CalendarScheduleController::class, 'create'])->middleware('role:Administrator');
+    Route::apiResource('calendars', CalendarScheduleController::class);
+    
 
     /*
     |--------------------------------------------------------------------------

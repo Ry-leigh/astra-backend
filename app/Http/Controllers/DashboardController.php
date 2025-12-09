@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AttendanceRecord;
 use App\Models\ClassSchedule;
+use App\Models\ClassSession;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -69,4 +71,60 @@ class DashboardController extends Controller
             'schedule' => $schedules
         ]);
     }
+
+    public function attendanceCount($year){
+        if ($year == null) {
+            $year = 2025;
+        }
+
+        $year = date('Y');
+
+        $months = collect([
+            'Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'
+        ])->map(fn($name, $index) => [
+            'name' => $name,
+            'present' => 0,
+            'late' => 0,
+            'absent' => 0,
+        ]);
+
+        // 2. Get actual attendance counts from DB
+        $attendance = AttendanceRecord::selectRaw('
+            MONTH(class_sessions.session_date) AS month_number,
+            SUM(CASE WHEN attendance_records.status = "present" THEN 1 ELSE 0 END) AS present,
+            SUM(CASE WHEN attendance_records.status = "late" THEN 1 ELSE 0 END) AS late,
+            SUM(CASE WHEN attendance_records.status = "absent" THEN 1 ELSE 0 END) AS absent
+        ')
+        ->join('class_sessions', 'attendance_records.class_session_id', '=', 'class_sessions.id')
+        ->whereYear('class_sessions.session_date', $year)
+        ->groupBy('month_number')
+        ->get();
+
+        $months = $months->map(function($month, $index) use ($attendance) {
+            $record = $attendance->firstWhere('month_number', $index + 1);
+            if ($record) {
+                $month['present'] = (int) $record->present;
+                $month['late'] = (int) $record->late;
+                $month['absent'] = (int) $record->absent;
+            }
+            return $month;
+        });
+
+        $yearRange = DB::table('class_sessions')
+            ->selectRaw('MIN(YEAR(session_date)) as min_year, MAX(YEAR(session_date)) as max_year')
+            ->first();
+
+        $minYear = $yearRange->min_year;
+        $maxYear = $yearRange->max_year;
+
+        $attendance = AttendanceRecord::where('status', 'late')->count();
+
+        return response()->json([
+            'success' => true,
+            'attendance' => $months,
+            'minYear' => $minYear,
+            'maxYear' => $maxYear
+        ]);
+    }
 }
+

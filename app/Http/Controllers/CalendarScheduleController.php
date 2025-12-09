@@ -80,43 +80,63 @@ class CalendarScheduleController extends Controller
         return response()->json($schedule);
     }
 
+    private function formatProgramName($str) {
+        $stopWords = ["in", "of", "and"];
+
+        // Match title + optional section digits
+        preg_match('/^(.*?)(\d.*)?$/', $str, $matches);
+
+        $title = trim($matches[1] ?? '');
+        $section = isset($matches[2]) ? trim($matches[2]) : '';
+
+        // Avoid empty splits
+        $words = array_filter(preg_split('/\s+/', $title));
+
+        // Build acronym
+        $acronym = implode('', array_map(function($word) use ($stopWords) {
+            return in_array(strtolower($word), $stopWords)
+                ? ''
+                : strtoupper($word[0]);
+        }, $words));
+
+        return trim($acronym . ($section ? ' ' . $section : ''));
+    }
+
     public function create() {
         $user = Auth::user();
-        $roleNames = $user->roles->pluck('name')->toArray();
 
-        if (!in_array('Administrator', $roleNames)) {
-            return response()->json(['message' => 'Unauthorized.'], 403);
-        }
+        if ($user->hasRole('Administrator')) {
+            $roles = Role::select('id', 'name')->get();
+            $programs = Program::select('id', 'name')->get();
+            $classrooms = Classroom::join('programs', 'classrooms.program_id', '=', 'programs.id')
+                ->select('classrooms.id', DB::raw("CONCAT(programs.name, ' ', classrooms.year_level, classrooms.section) as name"))
+                ->get();
+            $classCourses = ClassCourse::with(['course', 'classroom.program', 'instructor.user'])
+                ->get()
+                ->map(fn($cc) => [
+                    'id' => $cc->id,
+                    'name' => sprintf(
+                        '%s - %s %s%s',
+                        $cc->course->code,
+                        // match($cc->instructor->user->sex) {
+                        //     'M' => 'Sir ',
+                        //     'F' => "Ma'am ",
+                        //     default => '',
+                        // } . $cc->instructor->user->first_name . ' ' . $cc->instructor->user->last_name,
+                        $this->formatProgramName($cc->classroom->program->name),
+                        $cc->classroom->year_level,
+                        $cc->classroom->section
+                    )
+                ]);
 
-        $roles = Role::select('id', 'name')->get();
-        $programs = Program::select('id', 'name')->get();
-        $classrooms = Classroom::join('programs', 'classrooms.program_id', '=', 'programs.id')
-            ->select('classrooms.id', DB::raw("CONCAT(programs.name, ' ', classrooms.year_level, classrooms.section) as name"))
-            ->get();
-        $classCourses = ClassCourse::with(['course', 'classroom.program', 'instructor.user'])
-            ->get()
-            ->map(fn($cc) => [
-                'id' => $cc->id,
-                'name' => sprintf(
-                    '%s | %s - %s %s%s',
-                    $cc->course->name,
-                    match($cc->instructor->user->sex) {
-                        'M' => 'Sir ',
-                        'F' => "Ma'am ",
-                        default => '',
-                    } . $cc->instructor->user->first_name . ' ' . $cc->instructor->user->last_name,
-                    $cc->classroom->program->name,
-                    $cc->classroom->year_level,
-                    $cc->classroom->section
-                )
+            return response()->json([
+                'success' => true,
+                'roles' => $roles,
+                'programs' => $programs,
+                'classrooms' => $classrooms,
+                'class_courses' => $classCourses,
             ]);
-
-        return response()->json([
-            'roles' => $roles,
-            'programs' => $programs,
-            'classrooms' => $classrooms,
-            'class_courses' => $classCourses,
-        ]);
+        }
     }
 
     public function store(Request $request) {
@@ -182,7 +202,7 @@ class CalendarScheduleController extends Controller
 
         $schedule->targets()->createMany($targets);
 
-        return response()->json(['message' => 'Schedule created successfully.']);
+        return response()->json(['success' => true,'message' => 'Schedule created successfully.']);
     }
 
     public function update(Request $request, $id) {
