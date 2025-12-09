@@ -47,11 +47,7 @@ class DashboardController extends Controller
 
         
         $todayDay = Carbon::now()->format('l');
-        if ($user->hasRole('Administrator')) {
-            $schedules = ClassSchedule::with(['classCourse', 'classCourse.course:id,name,description,code,units', 'classCourse.instructor.user:id,sex,first_name,Last_name'])
-            ->where('day_of_week', $todayDay)
-            ->get();
-        } elseif ($user->hasRole('Instructor')) {
+        if ($user->instructor->id) {
             $schedules = ClassSchedule::with(['classCourse', 'classCourse.course:id,name,description,code,units', 'classCourse.instructor.user:id,sex,first_name,Last_name'])
                 ->whereHas('classCourse', function ($query) use ($user) {
                     $query->where('instructor_id', $user->instructor->id);
@@ -64,6 +60,8 @@ class DashboardController extends Controller
                 ->whereIn('class_course_id', $classIds)
                 ->where('day_of_week', $todayDay)
                 ->get();
+        } else {
+            $schedules = null;
         }
 
         if ($user->instructor) {
