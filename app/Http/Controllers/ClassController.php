@@ -27,8 +27,8 @@ class ClassController extends Controller
         ]);
 
         switch (true) {
-            case $user->hasRole('Instructor') || $user->hasRole('Administrator') && $user->instructor:
-                $query->where('instructor_id', $user->instructor->id);
+            case $user->hasRole('Instructor') || $user->hasRole('Administrator'):
+                $query->where('instructor_id', $user->instructor->id ?? -1);
                 break;
 
             case $user->hasRole('Officer') && $user->student:
