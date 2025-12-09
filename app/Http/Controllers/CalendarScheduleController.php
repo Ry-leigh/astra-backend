@@ -214,15 +214,23 @@ class CalendarScheduleController extends Controller
         $schedule = CalendarSchedule::findOrFail($id);
 
         $validated = $request->validate([
-            'title' => 'sometimes|string|max:255',
+            'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'start_date' => 'sometimes|date',
+            'start_date' => 'required|date',
             'end_date' => 'nullable|date',
-            'all_day' => 'boolean',
-            'start_time' => 'nullable|date_format:H:i',
-            'end_time' => 'nullable|date_format:H:i',
-            'category' => 'sometimes|in:holiday,event,meeting,exam,makeup',
-            'targets' => 'nullable|array',
+            'all_day' => 'nullable|boolean',
+            'start_time' => 'nullable|date_format:H:i:s',
+            'end_time' => 'nullable|date_format:H:i:s',
+            'category' => 'required|in:holiday,event,meeting,exam,makeup_class',
+            'class_course_id' => 'nullable|exists:class_courses,id',
+            'room' => 'nullable',
+            'repeats' => 'nullable|in:none,daily,weekly,monthly,yearly',
+            'targets' => 'required|array',
+            'targets.global' => 'boolean',
+            'targets.roles' => 'array',
+            'targets.programs' => 'array',
+            'targets.classrooms' => 'array',
+            'targets.class_courses' => 'array',
         ]);
 
         $schedule->update([...$validated, 'last_updated_by' => $user->id]);
@@ -250,7 +258,7 @@ class CalendarScheduleController extends Controller
             $schedule->targets()->createMany($targets);
         }
 
-        return response()->json(['message' => 'Schedule updated successfully.']);
+        return response()->json(['success' => true, 'message' => 'Schedule updated successfully.']);
     }
 
     public function destroy($id) {

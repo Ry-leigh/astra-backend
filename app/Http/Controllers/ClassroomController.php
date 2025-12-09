@@ -69,7 +69,7 @@ class ClassroomController extends Controller
             'academic_year_id' => 'required|exists:academic_years,id',
         ]);
 
-        $validated['section'] = $validated['section'] ?: null; // normalize empty string to null
+        $validated['section'] = $validated['section'] ?: "";
 
         $classroom = Classroom::firstOrCreate([
             'program_id' => $validated['program_id'],
