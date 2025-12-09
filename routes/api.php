@@ -117,7 +117,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     | Admin manages courses; Instructors and Students view their own.
     */
     Route::prefix('courses')->group(function () {
-        Route::get('/{classroomId}', [CourseController::class, 'index'])->middleware('role:Administrator');
+        Route::get('/{classroomId?}', [CourseController::class, 'index'])->middleware('role:Administrator');
         Route::get('/add/{classroomId}', [ClassController::class, 'create']);
         Route::post('/{classroomId}', [ClassController::class, 'store'])->middleware('role:Administrator');
         Route::put('/{classroomId}/{id}', [ClassController::class, 'update'])->middleware('role:Administrator');

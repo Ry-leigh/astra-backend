@@ -13,6 +13,14 @@ class CourseController extends Controller
 {
     public function index($classroomId)
     {
+        if ($classroomId == null) {
+            $courses = ClassCourse::get();
+            return response()->json([
+            'success' => true,
+            'courses' => $courses
+        ]);
+        }
+
         $classroom = Classroom::with('program')->findOrFail($classroomId);
 
         $programName = $classroom->program ? $classroom->program->name : 'Unknown Program';

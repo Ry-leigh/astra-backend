@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AcademicYear;
 use App\Models\ClassCourse;
 use App\Models\Classroom;
 use App\Models\Course;
 use App\Models\Instructor;
 use App\Models\Semester;
+use Carbon\Carbon;
 use Database\Seeders\CourseSeeder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,10 +27,7 @@ class ClassController extends Controller
         ]);
 
         switch (true) {
-            case $user->hasRole('Administrator'):
-                break; // Admin sees all
-
-            case $user->hasRole('Instructor') && $user->instructor:
+            case $user->hasRole('Instructor') || $user->hasRole('Administrator') && $user->instructor:
                 $query->where('instructor_id', $user->instructor->id);
                 break;
 
@@ -50,8 +49,24 @@ class ClassController extends Controller
             default:
                 return response()->json(['message' => 'Unauthorized.'], 403);
         }
+        $currentDate = now()->toDateString();
 
-        return response()->json(['success' => true, 'classes' => $query->get()]);
+        $currentSemester = Semester::where('start_date', '<=', $currentDate)
+            ->where(function ($query) use ($currentDate) {
+                $query->where('end_date', '>=', $currentDate)
+                    ->orWhereNull('end_date');
+            })
+            ->first();
+
+        if (!$currentSemester) {
+            return 'No active semester found for today.';
+        }
+
+        $academicYearId = $currentSemester->academic_year_id;
+
+        $semesters = Semester::where('academic_year_id', $academicYearId)->get();
+
+        return response()->json(['success' => true, 'classes' => $query->get(), "semester" => $semesters]);
     }
 
     // Show details of a specific class

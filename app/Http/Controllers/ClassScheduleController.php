@@ -10,10 +10,8 @@ class ClassScheduleController extends Controller
 {
     public function index() {
         $user = Auth::user();
-
-        if ($user->hasRole('Administrator')) {
-            $schedules = ClassSchedule::with(['classCourse', 'classCourse.course:id,name,description,code,units', 'classCourse.instructor.user:id,sex,first_name,Last_name'])->get();
-        } elseif ($user->hasRole('Instructor')) {
+        
+        if ($user->hasRole('Instructor') || $user->hasRole('Administrator')) {
             $schedules = ClassSchedule::with(['classCourse', 'classCourse.course:id,name,description,code,units', 'classCourse.instructor.user:id,sex,first_name,Last_name'])
                 ->whereHas('classCourse', function ($query) use ($user) {
                     $query->where('instructor_id', $user->instructor->id);
