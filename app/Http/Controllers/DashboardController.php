@@ -47,21 +47,24 @@ class DashboardController extends Controller
 
         
         $todayDay = Carbon::now()->format('l');
-        if ($user->instructor->id) {
+        if ($user->hasRole('Instructor') || $user->instructor) {
             $schedules = ClassSchedule::with(['classCourse', 'classCourse.course:id,name,description,code,units', 'classCourse.instructor.user:id,sex,first_name,Last_name'])
                 ->whereHas('classCourse', function ($query) use ($user) {
                     $query->where('instructor_id', $user->instructor->id);
                 })
                 ->where('day_of_week', $todayDay)
                 ->get();
+        }
+        elseif ($user->hasRole('Administrator')) {
+            $schedules = ClassSchedule::with(['classCourse', 'classCourse.course:id,name,description,code,units', 'classCourse.instructor.user:id,sex,first_name,Last_name'])
+            ->where('day_of_week', $todayDay)
+            ->get();
         } elseif (($user->hasRole('Officer') || $user->hasRole('Student')) && $user->student) {
             $classIds = $user->student->enrollments->pluck('class_course_id');
             $schedules = ClassSchedule::with(['classCourse', 'classCourse.course:id,name,description,code,units', 'classCourse.instructor.user:id,sex,first_name,Last_name'])
                 ->whereIn('class_course_id', $classIds)
                 ->where('day_of_week', $todayDay)
                 ->get();
-        } else {
-            $schedules = null;
         }
 
         if ($user->instructor) {
@@ -86,7 +89,7 @@ $totalHours = ClassSchedule::whereIn(
         $latestAnnouncements = Announcement::latest()->take(3)->get();
 
         if ($user->student) {
-            $tasks = Task::whereIn('class_course_id', Enrollment::where('student_id', $user->student->id)->pluck('class_course_id'))->get();
+            // $tasks = Task::whereIn('class_course_id', Enrollment::where('student_id', $user->student->id)->pluck('class_course_id'))->get();
         
 
         $student = $user->student;
@@ -124,13 +127,13 @@ $totalHours = ClassSchedule::whereIn(
 
         return response()->json([
             'success' => true,
-            'message' => $greetings ?? null,
-            'user' => $user ?? null,
-            'date' => $today ?? null,
-            'activeUsers' => $activeUsers ?? null,
-            'studentCount' => $studentCount ?? null,
-            'instructorCount' => $instructorCount ?? null,
-            'schedule' => $schedules ?? null,
+            'message' => $greetings,
+            'user' => $user,
+            'date' => $now,
+            'activeUsers' => $activeUsers,
+            'studentCount' => $studentCount,
+            'instructorCount' => $instructorCount,
+            'schedule' => $schedules,
             'handledSubjects' => $handledSubjects ?? null,
             'handledStudents' => $handledStudents ?? null,
             'totalHours' => $totalHours ?? null,
