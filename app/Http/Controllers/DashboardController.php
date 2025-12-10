@@ -86,7 +86,7 @@ $totalHours = ClassSchedule::whereIn(
         $latestAnnouncements = Announcement::latest()->take(3)->get();
 
         if ($user->student) {
-            // $tasks = Task::whereIn('class_course_id', Enrollment::where('student_id', $user->student->id)->pluck('class_course_id'))->get();
+            $tasks = Task::whereIn('class_course_id', Enrollment::where('student_id', $user->student->id)->pluck('class_course_id'))->get();
         
 
         $student = $user->student;
@@ -124,13 +124,13 @@ $totalHours = ClassSchedule::whereIn(
 
         return response()->json([
             'success' => true,
-            'message' => $greetings,
-            'user' => $user,
-            'date' => $now,
-            'activeUsers' => $activeUsers,
-            'studentCount' => $studentCount,
-            'instructorCount' => $instructorCount,
-            'schedule' => $schedules,
+            'message' => $greetings ?? null,
+            'user' => $user ?? null,
+            'date' => $today ?? null,
+            'activeUsers' => $activeUsers ?? null,
+            'studentCount' => $studentCount ?? null,
+            'instructorCount' => $instructorCount ?? null,
+            'schedule' => $schedules ?? null,
             'handledSubjects' => $handledSubjects ?? null,
             'handledStudents' => $handledStudents ?? null,
             'totalHours' => $totalHours ?? null,
