@@ -57,7 +57,7 @@ class DashboardController extends Controller
         }
         elseif ($user->hasRole('Administrator')) {
             $schedules = ClassSchedule::with(['classCourse', 'classCourse.course:id,name,description,code,units', 'classCourse.instructor.user:id,sex,first_name,Last_name'])
-            ->where('day_of_week', $todayDay)
+            ->where('day_of_week', -1)
             ->get();
         } elseif (($user->hasRole('Officer') || $user->hasRole('Student')) && $user->student) {
             $classIds = $user->student->enrollments->pluck('class_course_id');
@@ -133,7 +133,7 @@ $totalHours = ClassSchedule::whereIn(
             'activeUsers' => $activeUsers,
             'studentCount' => $studentCount,
             'instructorCount' => $instructorCount,
-            'schedule' => $schedules,
+            'schedule' => $schedules ?? null,
             'handledSubjects' => $handledSubjects ?? null,
             'handledStudents' => $handledStudents ?? null,
             'totalHours' => $totalHours ?? null,
